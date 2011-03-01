@@ -5,6 +5,7 @@ AM_INIT_AUTOMAKE([foreign])
 AC_CONFIG_FILES([
 	Makefile \
 	mindsweeper.spec \
+	desktop/Makefile \
 	pixmaps/Makefile \
 	pixmaps/counters/Makefile \
 	pixmaps/counters/mindsweeper/Makefile \
