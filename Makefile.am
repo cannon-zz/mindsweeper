@@ -10,7 +10,6 @@ mindsweeper_LDADD = $(GTK_LIBS)
 
 # legacy script for installing icon image, preserved for reference
 desktopinstall :
-	for x in $(DESTDIR){$(bindir),$(datadir)/{applications,pixmaps}} ; do [ -d $${x} ] || @INSTALL@ -m 0755 -d $${x} ; done
-	@INSTALL@ -m 0755 $(TARGET) $(DESTDIR)$(bindir)
-	@INSTALL@ -m 0644 mindsweeper.desktop $(DESTDIR)$(datadir)/applications
-	@INSTALL@ -m 0644 pixmaps/mindsweeper.png $(DESTDIR)$(datadir)/pixmaps
+	for x in $(DESTDIR)$(datadir)/{applications,pixmaps} ; do [ -d $${x} ] || $(INSTALL) -m 0755 -d $${x} ; done
+	$(INSTALL) -m 0644 mindsweeper.desktop $(DESTDIR)$(datadir)/applications
+	$(INSTALL) -m 0644 pixmaps/mindsweeper.png $(DESTDIR)$(datadir)/pixmaps
