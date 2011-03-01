@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=MindSweeper
+Comment=Intelligent Minefield Game
+Exec=mindsweeper
+Icon=mindsweeper.png
+Terminal=false
+Type=Application
+Categories=Application;Game

@@ -1,0 +1,42 @@
+Name: mindsweeper
+Version: @PACKAGE_VERSION@
+Release: 1
+Summary: Self-Playing Minefield Game
+Copyright: GPL
+Group: Applications/Games
+Source: %{name}-%{version}.tar.gz
+URL: http://mindsweeper.sourceforge.net
+Packager: Kipp Cannon
+BuildRoot: %{_tmppath}/%{name}-%{version}-root
+Prefix: %{_prefix}
+%description
+Mindsweeper is yet another minefield game.  Use the information on the game
+board to find the land mines.  This implementation will examine the
+information available to you at each turn and let you know if there is
+sufficient information to make a move without guessing.  Or just let the
+computer make the moves for you!
+
+
+%prep
+%setup -q
+
+
+%build
+%configure --with-counter=mindsweeper
+%{__make}
+
+
+%install
+%makeinstall
+
+
+%clean
+[ ${RPM_BUILD_ROOT} != "/" ] && rm -Rf ${RPM_BUILD_ROOT}
+rm -Rf ${RPM_BUILD_DIR}/%{name}-%{version}
+
+
+%files
+%defattr(-,root,root)
+%doc AUTHOR ChangeLog COPYING README TODO
+%{_bindir}/*
+%{_datadir}/*/*

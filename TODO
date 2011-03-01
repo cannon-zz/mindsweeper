@@ -1,0 +1,7 @@
+* Improve the search status graphics and "odometer" numerals.
+* Split the solver into a front-end and back-end so the algorithm can be
+  more easily re-used.
+* Option to filter games on solvability.
+* A random number generator with a longer period would be nice.
+* Make cell graphics scale with cell size.
+* Internationalization.

@@ -1,0 +1,92 @@
+Introduction:
+=============
+
+This is my contribution to the endless supply of minesweeper rip-offs.
+This one's claim to fame is that it tells you whether or not you can make a
+move based on the information provided.  I have found that this makes the
+game more challenging since people tend to assume too easily that a guess
+is required.  When told that a guess is not required, people try harder to
+solve the puzzle.
+
+The object of the game is to identify the locations of the mines in the
+minefield.  Click on a square with the 1st (usually left) mouse button to
+clear it.  Click with any other mouse button to flag it.  The left-most
+counter shows the number of mines which still need to be identified and the
+right-most counter shows how many seconds have elapsed.  The number to the
+left of the time counter is the game number (the seed for the random number
+generator).  As squares are cleared the number that is revealed under each
+one shows the number of that square's neighbours that contain mines.
+
+
+Requirements:
+=============
+
+	gtk+ >= 2.0.0
+	POSIX-like thread library (eg. LinuxThreads)
+
+
+Compiling/Installing:
+=====================
+
+Type
+
+	./configure --help
+
+for a list of configuration options then configure, compile and install the
+program by typing
+
+	./configure [options] ; make ; make install
+
+If you know how to build an .rpm, a .spec file is included.  For those of
+you who don't know how but would like to try anyway, go for
+
+	rpmbuild -ta mindsweeper-*.tar.gz
+
+Works perfectly on my system, your mileage may vary.
+
+
+Results:
+========
+
+So how many games can actually be completed?  For a 30x16 game board with
+100 mines (xdemineur's default mode) 86.27% of the games that start with an
+open region require at least one guess.  That percentage was arrived at by
+simulating 1 million games.  If you would like to test a board size and
+mine density yourself then here's what you do.  First, compile the code
+with the --enable-diagnostics option supplied to the configure script.
+Then run the program with, for example, the following options
+
+	mindsweeper -c 30 -r 16 -m 100 -g 10000 -o -a -l
+
+which will play 10000 games of a 30x16 board with 100 mines.  If you would
+like to watch it play the games then omit the "-l" option but it will run
+much slower.  When done, the program will display the total number of games
+played, the total number which were won and the number of games that
+required a guess.  The number of games lost is also displayed but this
+should always be 0 unless there's a bug in the game-play engine (i.e. it
+shouldn't make mistakes and stomp on mines).
+
+Note that the random number generator used to produce board layouts is the
+regular random number generator in your C library.  For the GNU C library
+this generator claims to have a period corresponding to 35 bits.  The game
+board on advanced mode has 480 squares of which 100 contain mines for a
+total of 10^105 possible layouts.  In this case, the fraction of possible
+layouts that can be generated is 10^-95 so the random number generator
+hardly samples any of the available phase space.  Ah well... since I'm too
+lazy to implement a random number generator with a period of 10^105, we'll
+just have to dream of what those wondrous board layouts might be like ;-).
+
+It should be mentioned that the mine probabilities computed by the solver
+are just that:  the probability that the given site contains a mine based
+on the information available.  These probabilities do not, in general,
+indicate the "best" move.  For example, one should not assume that clearing
+the site with the lowest probability or, likewise, flagging the site with
+the highest probability is the move that is most likely to lead to a solved
+gameboard.  The problem here is the question of what information will be
+provided by making a move and will that information aid in solving the
+board any further.  Making a safe move that only leaves you needing to make
+a second guess elsewhere may, in the end, have exposed you to a greater
+probability of failure than would have a dangerous move that you knew would
+provide useful information about the rest of the board.  Such a
+sophisticated analysis of the gameboard is very complex and beyond the
+capabilities of this software.

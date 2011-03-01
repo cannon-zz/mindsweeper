@@ -1,0 +1,89 @@
+1.10
+	* Fixed URL in About dialog.
+
+1.9
+	* Renamed autoplay.* to solver.*.
+	* Began spliting the solver into a front-end and generic back-end.
+	* Extensive elimination and re-organization of global variables.
+	* Found and fixed a bug in the solver:  it was not able to
+	  correctly identify situations in which all non-border sites can
+	  be flagged.  Recomputed playability of Advanced level to confirm
+	  the numbers in the README file.
+	* Replaced some linked lists in the solver with arrays.  This
+	  will lead the way to an in-place arrangement analyzer (as opposed
+	  to the recursive implementation currently being used).
+	* Changed URL in .spec file to new SourceForge site.
+	* Disabled -g and -l command line options if diagnostics mode not
+	  enabled.
+	* Reworked the "quick move" implementation in the solver.  Now
+	  possible mine sites are found first and the quick move analyzer
+	  processes only them.  This avoids scanning the entire board for
+	  cells twice in the event the quick move algorithm fails but
+	  overall I believe this represents a reduction in solver
+	  performance.
+	* Converted the quick move algorithm into a list optimizing
+	  algorithm.  The idea is to move cells that can be decided based
+	  on their immediate neighbours to the front of each list of cells.
+	  This prevents them from being tested over and over again and so
+	  speeds up full arrangement analysis mode but slows down full
+	  board analysis
+	* Solver now computes mine probabilities for nonborder cells.
+	* "Perform board analysis" must now be selected in order to select
+	  "Autoplay".
+	* Fixed an off-by-one bug in the minefield widget's clipping code
+	  that was causing random segfaults.
+
+1.8
+	* Fixed some bad math in the README file.
+	* Some appearance tweaks.
+	* HISTORY renamed to ChangeLog.
+	* First pass at displaying mine probabilities.  The solver, of
+	  course, knows the probabilities for free as a side effect of its
+	  algorithm.  What we need to do is pass this information to the
+	  MineField widget and have it displayed somehow.
+	* The solver's algorithm is now forced to full arrangement analysis
+	  mode if probability display is selected.  If this is not done, we
+	  don't obtain probabilities for many sites since the quick move
+	  feature short-cuts the process.
+
+1.7
+	* Autoplay code clean-ups.
+	* Autoplay now proceeds even if "Show hints" is turned off.
+	* Some appearance tweaks.
+	* Game board is now hidden when clock is paused.
+	* Expanded both counters to four digits.
+	* A few minor .spec file adjustments (relocatability, URL, etc.)
+	* Fixed first autoplay game not starting on program start.
+	* Reimplemented diagnostics mode and obtained corrected stats for
+	  the playability of expert mode.
+	* Removed the arrangement limit from the solver.  In practice it is
+	  never invoked.
+
+1.6
+	* Autoplay code clean-ups.
+	* Complete rewrite of the MineField widget.  It is now a true GTK 2
+	  widget derived directly from the GtkWidget class featuring Pango-
+	  and GTK-rendered cell graphics.  This gives it a smaller memory
+	  footprint, makes it obey your GTK theme, and has made it about
+	  300% faster.
+	* Made the cell size of the MineField widget run-time
+	  configurable and added a slider to the game settings window.
+
+1.5
+	* Cleaned up the autoplay code a bit and finally fixed the known
+	  weaknesses in its logic:  (i) the computer can now correctly
+	  identify and clear the isolated "3" and "2" at the bottom middle
+	  of game #1130737257;  (ii) the computer can now correctly rule
+	  out one of the two possible arrangements of flags in the top
+	  right corner of game number #1662171257 allowing it to finish
+	  the board.  At this point, there are no known failings in the
+	  computer's game play logic.
+	* Added the "paused when not focused" option.
+	* Added the Bobby Fischer game presets.
+	* Added the desktop file and icon.
+
+1.4
+	* Ported the user interface to GTK 2.0
+	* Started this HISTORY file
+	* Various code clean-ups.
+	* Tracked down the reason for some user interface lock-ups.
