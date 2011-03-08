@@ -53,7 +53,7 @@
  * through calls to minefield_set_state().  The current state of a cell on
  * the MineField can be retrieved with a call to minefield_get_state().
  * Row and column co-ordinates start with 1,1 in the top-left corner of the
- * game board (this may change in the future).
+ * game board (this might change in the future).
  *
  */
 
@@ -434,9 +434,9 @@ static gboolean motion_notify_event(GtkWidget *widget, GdkEventMotion *event)
  * Widget class infrastructure
  */
 
-static void class_init(MineFieldClass *class)
+static void class_init(MineFieldClass *klass)
 {
-	GtkWidgetClass *widget_class = GTK_WIDGET_CLASS(class);
+	GtkWidgetClass *widget_class = GTK_WIDGET_CLASS(klass);
 	GdkColormap  *colourmap;
 	gint  i, width, height;
 
@@ -460,22 +460,24 @@ static void class_init(MineFieldClass *class)
 	 * Signals
 	 */
 
-	class->action = NULL;
+	klass->action = NULL;
 
-	minefield_signal[MINEFIELD_ACTION] =
-	     gtk_signal_new("action",
-	                    GTK_RUN_FIRST,
-	                    GTK_CLASS_TYPE(GTK_OBJECT_CLASS(class)),
-	                    GTK_SIGNAL_OFFSET(MineFieldClass, action),
-	                    gtk_marshal_NONE__POINTER,
-	                    GTK_TYPE_NONE,
-	                    1, GDK_TYPE_EVENT);
+	minefield_signal[MINEFIELD_ACTION] = gtk_signal_new(
+		"action",
+		GTK_RUN_FIRST,
+		GTK_CLASS_TYPE(GTK_OBJECT_CLASS(klass)),
+		GTK_SIGNAL_OFFSET(MineFieldClass, action),
+		gtk_marshal_NONE__POINTER,
+		GTK_TYPE_NONE,
+		1,
+		GDK_TYPE_EVENT
+	);
 
 	/*
 	 * Event Handlers
 	 */
 
-	parent_class = g_type_class_peek_parent(class);
+	parent_class = g_type_class_peek_parent(klass);
 
 	widget_class->realize = realize;
 	widget_class->size_request = size_request;

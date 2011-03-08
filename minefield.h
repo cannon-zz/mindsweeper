@@ -18,29 +18,32 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+
 /*
  * Game board widget description
  */
 
+
 #ifndef _MINEFIELD_H_
 #define _MINEFIELD_H_
+
 
 #include <gdk/gdk.h>
 #include <gtk/gtkwidget.h>
 #include <gtk/gtktooltips.h>
 
+
 #define MINEFIELD(obj)		GTK_CHECK_CAST(obj, minefield_get_type(), MineField)
 #define MINEFIELD_CLASS(klass)	GTK_CHECK_CLASS_CAST(klass, minefield_get_type(), MineFieldClass)
 #define IS_MINEFIELD(obj)	GTK_CHECK_TYPE(obj, minefield_get_type())
 
-typedef struct _MineField	MineField;
-typedef struct _MineFieldClass	MineFieldClass;
 
-struct _MineFieldClass {
+typedef struct {
 	GtkWidgetClass  parent_class;
 
 	void (*action)  (GdkEventButton *);	/* FIXME: make custom struct */
-};
+} MineFieldClass;
+
 
 typedef enum {
 	MINEFIELD_MINES_0 = 0,
@@ -59,7 +62,8 @@ typedef enum {
 	MINEFIELD_WRONG
 } MineFieldState;
 
-struct _MineField {
+
+typedef struct {
 	GtkWidget  widget;
 
 	gint  cell_size;
@@ -74,10 +78,11 @@ struct _MineField {
 
 	MineFieldState *cell;
 	gfloat  *probability;
-};
+} MineField;
+
 
 guint minefield_get_type(void);
-MineField* minefield_new(gint, gint);
+MineField *minefield_new(gint, gint);
 void minefield_reset(MineField *);
 void minefield_set_cell_size(MineField *, gint);
 gint minefield_get_cell_size(MineField *);
@@ -91,5 +96,6 @@ MineFieldState minefield_get_state(MineField *, gint, gint);
 
 
 extern gint MineFieldMinCellSize;
+
 
 #endif /* _MINEFIELD_H_ */
