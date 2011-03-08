@@ -33,22 +33,44 @@
  * Pixmap files
  */
 
+/* the const hack changes the delcaration inside about.xml from
+ *	static char *blah[]
+ * to
+ *	const static char *blah[] 
+ * which silences an incompatible pointer warning */
+const
 #include "pixmaps/about.xpm"
+const
 #include "digit_0.xpm"
+const
 #include "digit_1.xpm"
+const
 #include "digit_2.xpm"
+const
 #include "digit_3.xpm"
+const
 #include "digit_4.xpm"
+const
 #include "digit_5.xpm"
+const
 #include "digit_6.xpm"
+const
 #include "digit_7.xpm"
+const
 #include "digit_8.xpm"
+const
 #include "digit_9.xpm"
+const
 #include "gameover.xpm"
+const
 #include "guess.xpm"
+const
 #include "noguess.xpm"
+const
 #include "noanalysis.xpm"
+const
 #include "searching.xpm"
+const
 #include "stopped.xpm"
 
 
@@ -63,11 +85,9 @@
 
 static MineField  *gameboard;
 static GdkPixbuf  *digit_pixbuf[10];
-static GdkPixmap  *digit_pixmap[10];
-static GdkPixmap  *gameover_pixmap, *guess_pixmap, *noguess_pixmap;
-static GdkPixmap  *noanalysis_pixmap, *searching_pixmap, *stopped_pixmap;
-static GdkPixmap  *about_pixmap;
-static GdkBitmap  *about_mask;
+static GdkPixbuf  *gameover_pixbuf, *guess_pixbuf, *noguess_pixbuf;
+static GdkPixbuf  *noanalysis_pixbuf, *searching_pixbuf, *stopped_pixbuf;
+static GdkPixbuf  *about_pixbuf;
 static GtkWidget  *game_number_label;
 static GtkWidget  *status_img;
 static GtkWidget  *mine_digits[MINE_DIGITS];
@@ -139,7 +159,7 @@ static void ui_update_counter(GtkWidget **digit, int digits, int count)
 		count = 0;
 
 	for(i = 0; i < digits; i++) {
-		gtk_pixmap_set(GTK_PIXMAP(digit[i]), digit_pixmap[count%10], NULL);
+		gtk_image_set_from_pixbuf(GTK_IMAGE(digit[i]), digit_pixbuf[count%10]);
 		count /= 10;
 	}
 }
@@ -205,25 +225,25 @@ void ui_update_status(enum status_t status)
 		return;
 
 	if(status == gameover)
-		gtk_pixmap_set(GTK_PIXMAP(status_img), gameover_pixmap, NULL);
+		gtk_image_set_from_pixbuf(GTK_IMAGE(status_img), gameover_pixbuf);
 	else if(!settings.analysis)
-		gtk_pixmap_set(GTK_PIXMAP(status_img), noanalysis_pixmap, NULL);
+		gtk_image_set_from_pixbuf(GTK_IMAGE(status_img), noanalysis_pixbuf);
 	else if(!state.won && !state.lost)
 		switch(status) {
 		case stopped:
-			gtk_pixmap_set(GTK_PIXMAP(status_img), stopped_pixmap, NULL);
+			gtk_image_set_from_pixbuf(GTK_IMAGE(status_img), stopped_pixbuf);
 			break;
 
 		case searching:
-			gtk_pixmap_set(GTK_PIXMAP(status_img), searching_pixmap, NULL);
+			gtk_image_set_from_pixbuf(GTK_IMAGE(status_img), searching_pixbuf);
 			break;
 
 		case guess:
-			gtk_pixmap_set(GTK_PIXMAP(status_img), guess_pixmap, NULL);
+			gtk_image_set_from_pixbuf(GTK_IMAGE(status_img), guess_pixbuf);
 			break;
 
 		case noguess:
-			gtk_pixmap_set(GTK_PIXMAP(status_img), noguess_pixmap, NULL);
+			gtk_image_set_from_pixbuf(GTK_IMAGE(status_img), noguess_pixbuf);
 			break;
 
 		case gameover:
@@ -238,36 +258,26 @@ void ui_update_status(enum status_t status)
  * reads the xpm data for all the images
  */
 
-static void read_pixmaps(GtkWidget *window)
+static gboolean read_pixmaps(void)
 {
-	digit_pixbuf[0] = gdk_pixbuf_new_from_file("pixmaps/counters/mindsweeper/digit_0.xpm", NULL);
-	digit_pixbuf[1] = gdk_pixbuf_new_from_file("pixmaps/counters/mindsweeper/digit_1.xpm", NULL);
-	digit_pixbuf[2] = gdk_pixbuf_new_from_file("pixmaps/counters/mindsweeper/digit_2.xpm", NULL);
-	digit_pixbuf[3] = gdk_pixbuf_new_from_file("pixmaps/counters/mindsweeper/digit_3.xpm", NULL);
-	digit_pixbuf[4] = gdk_pixbuf_new_from_file("pixmaps/counters/mindsweeper/digit_4.xpm", NULL);
-	digit_pixbuf[5] = gdk_pixbuf_new_from_file("pixmaps/counters/mindsweeper/digit_5.xpm", NULL);
-	digit_pixbuf[6] = gdk_pixbuf_new_from_file("pixmaps/counters/mindsweeper/digit_6.xpm", NULL);
-	digit_pixbuf[7] = gdk_pixbuf_new_from_file("pixmaps/counters/mindsweeper/digit_7.xpm", NULL);
-	digit_pixbuf[8] = gdk_pixbuf_new_from_file("pixmaps/counters/mindsweeper/digit_8.xpm", NULL);
-	digit_pixbuf[9] = gdk_pixbuf_new_from_file("pixmaps/counters/mindsweeper/digit_9.xpm", NULL);
-
-	digit_pixmap[0] = gdk_pixmap_create_from_xpm_d(window->window, NULL, NULL, digit_0_xpm);
-	digit_pixmap[1] = gdk_pixmap_create_from_xpm_d(window->window, NULL, NULL, digit_1_xpm);
-	digit_pixmap[2] = gdk_pixmap_create_from_xpm_d(window->window, NULL, NULL, digit_2_xpm);
-	digit_pixmap[3] = gdk_pixmap_create_from_xpm_d(window->window, NULL, NULL, digit_3_xpm);
-	digit_pixmap[4] = gdk_pixmap_create_from_xpm_d(window->window, NULL, NULL, digit_4_xpm);
-	digit_pixmap[5] = gdk_pixmap_create_from_xpm_d(window->window, NULL, NULL, digit_5_xpm);
-	digit_pixmap[6] = gdk_pixmap_create_from_xpm_d(window->window, NULL, NULL, digit_6_xpm);
-	digit_pixmap[7] = gdk_pixmap_create_from_xpm_d(window->window, NULL, NULL, digit_7_xpm);
-	digit_pixmap[8] = gdk_pixmap_create_from_xpm_d(window->window, NULL, NULL, digit_8_xpm);
-	digit_pixmap[9] = gdk_pixmap_create_from_xpm_d(window->window, NULL, NULL, digit_9_xpm);
-	gameover_pixmap  = gdk_pixmap_create_from_xpm_d(window->window, NULL, NULL, gameover_xpm);
-	guess_pixmap     = gdk_pixmap_create_from_xpm_d(window->window, NULL, NULL, guess_xpm);
-	noguess_pixmap   = gdk_pixmap_create_from_xpm_d(window->window, NULL, NULL, noguess_xpm);
-	noanalysis_pixmap   = gdk_pixmap_create_from_xpm_d(window->window, NULL, NULL, noanalysis_xpm);
-	searching_pixmap = gdk_pixmap_create_from_xpm_d(window->window, NULL, NULL, searching_xpm);
-	stopped_pixmap   = gdk_pixmap_create_from_xpm_d(window->window, NULL, NULL, stopped_xpm);
-	about_pixmap     = gdk_pixmap_create_from_xpm_d(window->window, &about_mask, NULL, about_xpm);
+	digit_pixbuf[0] = gdk_pixbuf_new_from_xpm_data(digit_0_xpm);
+	digit_pixbuf[1] = gdk_pixbuf_new_from_xpm_data(digit_1_xpm);
+	digit_pixbuf[2] = gdk_pixbuf_new_from_xpm_data(digit_2_xpm);
+	digit_pixbuf[3] = gdk_pixbuf_new_from_xpm_data(digit_3_xpm);
+	digit_pixbuf[4] = gdk_pixbuf_new_from_xpm_data(digit_4_xpm);
+	digit_pixbuf[5] = gdk_pixbuf_new_from_xpm_data(digit_5_xpm);
+	digit_pixbuf[6] = gdk_pixbuf_new_from_xpm_data(digit_6_xpm);
+	digit_pixbuf[7] = gdk_pixbuf_new_from_xpm_data(digit_7_xpm);
+	digit_pixbuf[8] = gdk_pixbuf_new_from_xpm_data(digit_8_xpm);
+	digit_pixbuf[9] = gdk_pixbuf_new_from_xpm_data(digit_9_xpm);
+	gameover_pixbuf   = gdk_pixbuf_new_from_xpm_data(gameover_xpm);
+	guess_pixbuf      = gdk_pixbuf_new_from_xpm_data(guess_xpm);
+	noguess_pixbuf    = gdk_pixbuf_new_from_xpm_data(noguess_xpm);
+	noanalysis_pixbuf = gdk_pixbuf_new_from_xpm_data(noanalysis_xpm);
+	searching_pixbuf  = gdk_pixbuf_new_from_xpm_data(searching_xpm);
+	stopped_pixbuf    = gdk_pixbuf_new_from_xpm_data(stopped_xpm);
+	about_pixbuf    = gdk_pixbuf_new_from_xpm_data(about_xpm);
+	return TRUE;
 }
 
 
@@ -320,7 +330,7 @@ static void board_handler(GtkWidget *widget, GdkEventButton *event, gpointer dat
  * Handles the Exit menu item and any other close requests
  */
 
-static void exit_handler(GtkWidget *widget, gpointer data)
+static void exit_handler(GtkObject *object, gpointer data)
 {
 	local_get_minefield(&minefield);
 	gtk_main_quit();
@@ -367,13 +377,13 @@ static void board_size_presets(GtkObject *rows, GtkObject *cols, GtkObject *mine
 	gtk_adjustment_set_value(GTK_ADJUSTMENT(mines), default_mines[level]);
 }
 
-static gint settings_handler(GtkWidget *widget, gpointer action)
+static gint settings_handler(GtkObject *object, gpointer action)
 {
 	static GtkWidget  *window_settings = NULL;
 	static GtkObject  *rows, *cols, *mines, *cell_size;
 	static GtkWidget  *number, *open, *analysis, *probabilities, *autoplay, *pause;
 	static GtkWidget  *mines_label;
-	GtkWidget  *hbox, *table;
+	GtkWidget  *widget, *hbox, *table;
 	char  buff[14];
 #ifdef DIAGNOSTICS
 	static GtkWidget  *logmode;
@@ -393,8 +403,7 @@ static gint settings_handler(GtkWidget *widget, gpointer action)
 		window_settings = gtk_dialog_new();
 		gtk_window_set_title(GTK_WINDOW(window_settings), "Settings");
 		gtk_container_set_border_width(GTK_CONTAINER(window_settings), SPACING);
-		gtk_signal_connect(GTK_OBJECT(window_settings), "destroy",
-		                   GTK_SIGNAL_FUNC(settings_handler), (gpointer) settings_act_destroy);
+		g_signal_connect(GTK_OBJECT(window_settings), "destroy", G_CALLBACK(settings_handler), (gpointer) settings_act_destroy);
 
 
 		/* Default settings buttons */
@@ -404,23 +413,19 @@ static gint settings_handler(GtkWidget *widget, gpointer action)
 		gtk_box_pack_start(GTK_BOX(GTK_DIALOG(window_settings)->vbox), hbox, FALSE, FALSE, 0);
 
 		widget = gtk_button_new_with_label("Beginner");
-		gtk_signal_connect(GTK_OBJECT(widget), "clicked",
-		                   GTK_SIGNAL_FUNC(settings_handler), (gpointer) settings_act_beg);
+		g_signal_connect(GTK_OBJECT(widget), "clicked", G_CALLBACK(settings_handler), (gpointer) settings_act_beg);
 		gtk_box_pack_start(GTK_BOX(hbox), widget, TRUE, TRUE, 0);
 
 		widget = gtk_button_new_with_label("Intermediate");
-		gtk_signal_connect(GTK_OBJECT(widget), "clicked",
-		                   GTK_SIGNAL_FUNC(settings_handler), (gpointer) settings_act_int);
+		g_signal_connect(GTK_OBJECT(widget), "clicked", G_CALLBACK(settings_handler), (gpointer) settings_act_int);
 		gtk_box_pack_start(GTK_BOX(hbox), widget, TRUE, TRUE, 0);
 
 		widget = gtk_button_new_with_label("Advanced");
-		gtk_signal_connect(GTK_OBJECT(widget), "clicked",
-		                   GTK_SIGNAL_FUNC(settings_handler), (gpointer) settings_act_adv);
+		g_signal_connect(GTK_OBJECT(widget), "clicked", G_CALLBACK(settings_handler), (gpointer) settings_act_adv);
 		gtk_box_pack_start(GTK_BOX(hbox), widget, TRUE, TRUE, 0);
 
 		widget = gtk_button_new_with_label("Bobby Fischer");
-		gtk_signal_connect(GTK_OBJECT(widget), "clicked",
-		                   GTK_SIGNAL_FUNC(settings_handler), (gpointer) settings_act_bob);
+		g_signal_connect(GTK_OBJECT(widget), "clicked", G_CALLBACK(settings_handler), (gpointer) settings_act_bob);
 		gtk_box_pack_start(GTK_BOX(hbox), widget, TRUE, TRUE, 0);
 
 
@@ -437,7 +442,7 @@ static gint settings_handler(GtkWidget *widget, gpointer action)
 		gtk_scale_set_digits(GTK_SCALE(widget), 0);
 		gtk_range_set_update_policy(GTK_RANGE(widget), GTK_UPDATE_DISCONTINUOUS);
 		gtk_widget_set_usize(GTK_WIDGET(widget), 150, 40);
-		gtk_signal_connect(GTK_OBJECT(rows), "value_changed", GTK_SIGNAL_FUNC(settings_handler), (gpointer) settings_act_density);
+		g_signal_connect(GTK_OBJECT(rows), "value_changed", G_CALLBACK(settings_handler), (gpointer) settings_act_density);
 		gtk_table_attach_defaults(GTK_TABLE(table), widget, 1, 2, 0, 1);
 
 
@@ -449,7 +454,7 @@ static gint settings_handler(GtkWidget *widget, gpointer action)
 		gtk_scale_set_digits(GTK_SCALE(widget), 0);
 		gtk_range_set_update_policy(GTK_RANGE(widget), GTK_UPDATE_DISCONTINUOUS);
 		gtk_widget_set_usize(GTK_WIDGET(widget), 150, 40);
-		gtk_signal_connect(GTK_OBJECT(cols), "value_changed", GTK_SIGNAL_FUNC(settings_handler), (gpointer) settings_act_density);
+		g_signal_connect(GTK_OBJECT(cols), "value_changed", G_CALLBACK(settings_handler), (gpointer) settings_act_density);
 		gtk_table_attach_defaults(GTK_TABLE(table), widget, 1, 2, 1, 2);
 
 
@@ -462,7 +467,7 @@ static gint settings_handler(GtkWidget *widget, gpointer action)
 		gtk_scale_set_digits(GTK_SCALE(widget), 0);
 		gtk_range_set_update_policy(GTK_RANGE(widget), GTK_UPDATE_DISCONTINUOUS);
 		gtk_widget_set_usize(GTK_WIDGET(widget), 150, 40);
-		gtk_signal_connect(GTK_OBJECT(mines), "value_changed", GTK_SIGNAL_FUNC(settings_handler), (gpointer) settings_act_density);
+		g_signal_connect(GTK_OBJECT(mines), "value_changed", G_CALLBACK(settings_handler), (gpointer) settings_act_density);
 		gtk_table_attach_defaults(GTK_TABLE(table), widget, 1, 2, 2, 3);
 
 
@@ -496,7 +501,7 @@ static gint settings_handler(GtkWidget *widget, gpointer action)
 		analysis = gtk_check_button_new_with_label("Perform game board analysis");
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(analysis), settings.analysis);
 		gtk_box_pack_start(GTK_BOX(GTK_DIALOG(window_settings)->vbox), analysis, FALSE, FALSE, 0);
-		gtk_signal_connect(GTK_OBJECT(analysis), "toggled", GTK_SIGNAL_FUNC(settings_handler), (gpointer) settings_game_analysis);
+		g_signal_connect(GTK_OBJECT(analysis), "toggled", G_CALLBACK(settings_handler), (gpointer) settings_game_analysis);
 
 		probabilities = gtk_check_button_new_with_label("Show mine probabilities");
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(probabilities), settings.show_probability && settings.analysis);
@@ -522,11 +527,11 @@ static gint settings_handler(GtkWidget *widget, gpointer action)
 		/* OK and Cancel buttons */
 
 		widget = gtk_button_new_with_label("OK");
-		gtk_signal_connect(GTK_OBJECT(widget), "clicked", GTK_SIGNAL_FUNC(settings_handler), (gpointer) settings_act_ok);
+		g_signal_connect(GTK_OBJECT(widget), "clicked", G_CALLBACK(settings_handler), (gpointer) settings_act_ok);
 		gtk_box_pack_start(GTK_BOX(GTK_DIALOG(window_settings)->action_area), widget, TRUE, TRUE, 0);
 
 		widget = gtk_button_new_with_label("Cancel");
-		gtk_signal_connect(GTK_OBJECT(widget), "clicked", GTK_SIGNAL_FUNC(settings_handler), (gpointer) settings_act_cancel);
+		g_signal_connect(GTK_OBJECT(widget), "clicked", G_CALLBACK(settings_handler), (gpointer) settings_act_cancel);
 		gtk_box_pack_start(GTK_BOX(GTK_DIALOG(window_settings)->action_area), widget, TRUE, TRUE, 0);
 
 
@@ -627,42 +632,24 @@ static gint settings_handler(GtkWidget *widget, gpointer action)
  * About message
  */
 
-static gint about_message(GtkWidget *widget, gpointer data)
+static void about_message(GtkWidget *widget, gpointer data)
 {
-	static GtkWidget  *window = NULL;
-	GtkWidget *widg, *hbox;
-
-	if(window != NULL) {
-		gtk_widget_destroy(GTK_WIDGET(window));
-		window = NULL;
-		return FALSE;
-	}
-
-	window = gtk_dialog_new();
-	gtk_window_set_title(GTK_WINDOW(window), "About MindSweeper");
-	gtk_container_set_border_width(GTK_CONTAINER(window), SPACING);
-
-	hbox = gtk_hbox_new(FALSE, 0);
-	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(window)->vbox), hbox, TRUE, TRUE, 0);
-	widg = gtk_pixmap_new(about_pixmap, about_mask);
-	gtk_box_pack_start(GTK_BOX(hbox), widg, TRUE, FALSE, 2*SPACING);
-	widg = gtk_label_new(
-		"MindSweeper version " PACKAGE_VERSION "\n" \
-		"http://mindsweeper.sf.net\n" \
-		"Copyright (C) 2002 Kipp C. Cannon\n" \
-		"This program is free software; you can redistribute it and/or\n" \
-		"modify it under the terms of the GNU General Public License\n" \
-		"as published by the Free Software Foundation; either version\n" \
-		"2 of the License, or (at your option) any later version.");
-	gtk_box_pack_start(GTK_BOX(hbox), widg, TRUE, FALSE, 2*SPACING);
-
-	widg = gtk_button_new_with_label("Close");
-	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(window)->action_area), widg, TRUE, FALSE, 0);
-	gtk_signal_connect(GTK_OBJECT(widg), "clicked", GTK_SIGNAL_FUNC(about_message), NULL);
-
-	gtk_widget_show_all(window);
-
-	return FALSE;
+	static const gchar *authors[] = {
+		"Kipp C. Cannon",
+		NULL
+	};
+	gtk_show_about_dialog(
+		NULL,
+		"program-name", "MindSweeper",
+		"version", PACKAGE_VERSION,
+		"logo", about_pixbuf,
+		"authors", authors,
+		"copyright", "2002--2011",
+		"website", "http://mindsweeper.sf.net",
+		"license", "This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.",
+		"wrap-license", TRUE,
+		NULL
+	);
 }
 
 
@@ -682,28 +669,24 @@ void ui_init(void)
 	GtkWidget	*widget;
 
 	/*
+	 * Initialize the pixbufs
+	 */
+
+	read_pixmaps();
+
+	/*
 	 * Create main window and set it's characteristics
 	 */
+
 	window_main = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_policy(GTK_WINDOW(window_main), FALSE, FALSE, TRUE);
 	gtk_window_set_title(GTK_WINDOW(window_main), "MindSweeper");
 	gtk_container_set_border_width(GTK_CONTAINER(window_main), 0);
-	gtk_signal_connect(GTK_OBJECT(window_main), "destroy", GTK_SIGNAL_FUNC(exit_handler), NULL);
-	gtk_signal_connect(GTK_OBJECT(window_main), "focus_in_event", GTK_SIGNAL_FUNC(focus_change), NULL);
-	gtk_signal_connect(GTK_OBJECT(window_main), "focus_out_event", GTK_SIGNAL_FUNC(focus_change), NULL);
+	g_signal_connect(GTK_OBJECT(window_main), "destroy", G_CALLBACK(exit_handler), NULL);
+	g_signal_connect(GTK_OBJECT(window_main), "focus_in_event", G_CALLBACK(focus_change), NULL);
+	g_signal_connect(GTK_OBJECT(window_main), "focus_out_event", G_CALLBACK(focus_change), NULL);
 
 	gtk_hbutton_box_set_spacing_default(SPACING);
-
-	/*
-	 * Now get the pixmaps (needed to create window first so we could get
-	 * the background colour, but we need the pixmaps in order to
-	 * initialize the counters).  Must show the window first in order to
-	 * avoid the following.
-	 * Gdk-WARNING **: Creating pixmap from xpm with NULL window and colormap
-	 */
-
-	gtk_widget_show(window_main);
-	read_pixmaps(window_main);
 
 	/*
 	 * Window structure is:
@@ -728,27 +711,25 @@ void ui_init(void)
 	 *          frame:
 	 *             gameboard
 	 */
-	/* menu bar */
-	menubar = gtk_menu_bar_new();
-
-	widget = gtk_menu_item_new_with_label("Exit!");
-	gtk_signal_connect(GTK_OBJECT(widget), "activate", GTK_SIGNAL_FUNC(exit_handler), NULL);
-	gtk_menu_bar_append(GTK_MENU_BAR(menubar), widget);
-
-	widget = gtk_menu_item_new_with_label("Settings");
-	gtk_signal_connect(GTK_OBJECT(widget), "activate", GTK_SIGNAL_FUNC(settings_handler), (gpointer) settings_act_create);
-	gtk_menu_bar_append(GTK_MENU_BAR(menubar), widget);
-
-	widget = gtk_menu_item_new_with_label("About");
-	gtk_menu_item_right_justify(GTK_MENU_ITEM(widget));
-	gtk_signal_connect(GTK_OBJECT(widget), "activate", GTK_SIGNAL_FUNC(about_message), NULL);
-	gtk_menu_bar_append(GTK_MENU_BAR(menubar), widget);
-
 	/* vbox for whole window */
 	vbox = gtk_vbox_new(FALSE, SPACING);
 	gtk_container_add(GTK_CONTAINER(window_main), vbox);
 
-	gtk_box_pack_start(GTK_BOX(vbox), menubar, TRUE, TRUE, 0);
+	/* menu bar */
+	menubar = gtk_menu_bar_new();
+	gtk_box_pack_start(GTK_BOX(vbox), menubar, FALSE, TRUE, 0);
+
+	widget = gtk_menu_item_new_with_mnemonic("E_xit!");
+	gtk_menu_shell_append(GTK_MENU_SHELL(menubar), widget);
+	g_signal_connect(GTK_OBJECT(widget), "activate", G_CALLBACK(exit_handler), NULL);
+
+	widget = gtk_menu_item_new_with_mnemonic("_Settings");
+	gtk_menu_shell_append(GTK_MENU_SHELL(menubar), widget);
+	g_signal_connect(GTK_OBJECT(widget), "activate", G_CALLBACK(settings_handler), (gpointer) settings_act_create);
+
+	widget = gtk_menu_item_new_with_mnemonic("_About");
+	gtk_menu_shell_append(GTK_MENU_SHELL(menubar), widget);
+	g_signal_connect(GTK_OBJECT(widget), "activate", G_CALLBACK(about_message), NULL);
 
 	/* hbox for status row */
 	hbox = gtk_hbox_new(FALSE, 2*SPACING);
@@ -762,7 +743,7 @@ void ui_init(void)
 	hbox1 = gtk_hbox_new(FALSE, 0);
 	gtk_container_add(GTK_CONTAINER(frame), hbox1);
 	for(i = MINE_DIGITS-1; i >= 0; i--) {
-		mine_digits[i] = gtk_pixmap_new(digit_pixmap[0], NULL);
+		mine_digits[i] = gtk_image_new_from_pixbuf(digit_pixbuf[0]);
 		gtk_box_pack_start(GTK_BOX(hbox1), mine_digits[i], FALSE, FALSE, 0);
 	}
 
@@ -770,12 +751,12 @@ void ui_init(void)
 	frame = gtk_frame_new(NULL);
 	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
 	gtk_box_pack_start(GTK_BOX(hbox), frame, TRUE, FALSE, 0);
-	status_img = gtk_pixmap_new(stopped_pixmap, NULL);
+	status_img = gtk_image_new_from_pixbuf(stopped_pixbuf);
 	gtk_container_add(GTK_CONTAINER(frame), status_img);
 
 	/* new game button */
 	widget = gtk_button_new_with_label("New Game");
-	gtk_signal_connect(GTK_OBJECT(widget), "clicked", GTK_SIGNAL_FUNC(local_pre_game), NULL);
+	g_signal_connect(GTK_OBJECT(widget), "clicked", G_CALLBACK(local_pre_game), NULL);
 	gtk_box_pack_start(GTK_BOX(hbox), widget, TRUE, FALSE, 0);
 
 	/* game number indicator */
@@ -792,7 +773,7 @@ void ui_init(void)
 	hbox1 = gtk_hbox_new(FALSE, 0);
 	gtk_container_add(GTK_CONTAINER(frame), hbox1);
 	for(i = TIME_DIGITS-1; i >= 0; i--) {
-		time_digits[i] = gtk_pixmap_new(digit_pixmap[0], NULL);
+		time_digits[i] = gtk_image_new_from_pixbuf(digit_pixbuf[0]);
 		gtk_box_pack_start(GTK_BOX(hbox1), time_digits[i], FALSE, FALSE, 0);
 	}
 
@@ -807,7 +788,7 @@ void ui_init(void)
 
 	gameboard = minefield_new(minefield.rows, minefield.cols);
 	gtk_container_add(GTK_CONTAINER(widget), GTK_WIDGET(gameboard));
-	gtk_signal_connect(GTK_OBJECT(gameboard), "action", GTK_SIGNAL_FUNC(board_handler), &minefield);
+	g_signal_connect(GTK_OBJECT(gameboard), "action", G_CALLBACK(board_handler), &minefield);
 
 	/*
 	 * Finally make the window contents visible (do this last to avoid
