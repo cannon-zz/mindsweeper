@@ -109,25 +109,25 @@ static void unpress_square(struct minefield_t *mf, int col, int row)
 static int clear_square(struct minefield_t *mf, int col, int row)
 {
 	if(!IS_AVAILABLE(mf, col, row) || minefield_cell(mf, col, row)->is_flagged)
-		return(0);
+		return 0;
 
 	mf->unmarked--;
 	minefield_cell(mf, col, row)->is_cleared = 1;
 	update_square(mf, col, row);
 
 	if(minefield_cell(mf, col, row)->is_mine)
-		return(-mf->rows*mf->cols);
+		return -mf->rows*mf->cols;
 	if(minefield_cell(mf, col, row)->minesaround == 0)
-		return(1 + for_each_neighbour(mf, col, row, clear_square, +));
-	return(1);
+		return 1 + for_each_neighbour(mf, col, row, clear_square, +);
+	return 1;
 }
 
 static int clear_around(struct minefield_t *mf, int col, int row)
 {
 	if(FLAGSAROUND(mf, col, row) != minefield_cell(mf, col, row)->minesaround)
-		return(0);
+		return 0;
 
-	return(for_each_neighbour(mf, col, row, clear_square, +));
+	return for_each_neighbour(mf, col, row, clear_square, +);
 }
 
 static void toggle_flag(struct minefield_t *mf, int col, int row)
@@ -270,13 +270,13 @@ int make_move(struct minefield_t *mf, int col, int row, int button, enum action_
 
 	if(state.lost || state.won) {
 		buttons_down = 0;
-		return(FALSE);
+		return FALSE;
 	}
 
 	switch(action) {
-		case press:
+	case press:
 		switch(++buttons_down) {
-			case 1:
+		case 1:
 			last_col = col;
 			last_row = row;
 			made_move = FALSE;
@@ -284,7 +284,7 @@ int make_move(struct minefield_t *mf, int col, int row, int button, enum action_
 				press_square(mf, col, row);
 			break;
 
-			case 2:
+		case 2:
 			if(col != last_col || row != last_row)
 				break;
 			for_each_neighbour(mf, col, row, press_square, ;);
@@ -292,19 +292,19 @@ int make_move(struct minefield_t *mf, int col, int row, int button, enum action_
 		}
 		break;
 
-		case release:
+	case release:
 		switch(buttons_down--) {
-			case 1:
+		case 1:
 			unpress_square(mf, last_col, last_row);
 			if(minefield_cell(mf, last_col, last_row)->is_cleared || col != last_col || row != last_row)
 				break;
 			switch(button) {
-				case 1:
+			case 1:
 				if(clear_square(mf, col, row) < 0)
 					state.lost = TRUE;
 				break;
 
-				default:
+			default:
 				toggle_flag(mf, col, row);
 				break;
 			}
@@ -312,7 +312,7 @@ int make_move(struct minefield_t *mf, int col, int row, int button, enum action_
 			state.clock_started = TRUE;
 			break;
 
-			case 2:
+		case 2:
 			for_each_neighbour(mf, last_col, last_row, unpress_square, ;);
 			if(col != last_col || row != last_row)
 				break;
@@ -321,7 +321,7 @@ int make_move(struct minefield_t *mf, int col, int row, int button, enum action_
 				state.lost = TRUE;
 			break;
 
-			default:
+		default:
 			buttons_down = 0;
 			break;
 		}
@@ -341,5 +341,5 @@ int make_move(struct minefield_t *mf, int col, int row, int button, enum action_
 		break;
 	}
 
-	return((buttons_down == 0) && made_move);
+	return (buttons_down == 0) && made_move;
 }

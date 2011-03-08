@@ -132,10 +132,10 @@ static void computer_move(struct minefield_t *mf, int col, int row, enum moves_t
 {
 	ui_threads_enter();
 	switch(cmd) {
-		case nothing:
+	case nothing:
 		break;
 
-		case flag:
+	case flag:
 		ui_update_square_probability(row, col, 1.0);
 		if(settings.autoplay) {
 			make_move(mf, col, row, 3, press);
@@ -143,7 +143,7 @@ static void computer_move(struct minefield_t *mf, int col, int row, enum moves_t
 		}
 		break;
 
-		case clear:
+	case clear:
 		ui_update_square_probability(row, col, 0.0);
 		if(settings.autoplay) {
 			make_move(mf, col, row, 1, press);
@@ -151,7 +151,7 @@ static void computer_move(struct minefield_t *mf, int col, int row, enum moves_t
 		}
 		break;
 
-		case cleararound:
+	case cleararound:
 		for_each_neighbour(mf, col, row, zero_probability_if_available, ;);
 		if(settings.autoplay) {
 			make_move(mf, col, row, 1, press);
@@ -175,7 +175,7 @@ static void computer_move(struct minefield_t *mf, int col, int row, enum moves_t
 
 static int AVAILAROUND(struct minefield_t *mf, int col, int row)
 {
-	return(for_each_neighbour(mf, col, row, IS_AVAILABLE, +));
+	return for_each_neighbour(mf, col, row, IS_AVAILABLE, +);
 }
 
 
@@ -191,12 +191,12 @@ static int AVAILAROUND(struct minefield_t *mf, int col, int row)
 
 static int is_cleared_neighbour_of(struct minefield_t *mf, int c1, int r1, int c2, int r2)
 {
-	return(minefield_cell(mf, c1, r1)->is_cleared && (abs(c1 - c2) < 2) && (abs(r1 - r2) < 2));
+	return minefield_cell(mf, c1, r1)->is_cleared && (abs(c1 - c2) < 2) && (abs(r1 - r2) < 2);
 }
 
 static int are_dependant(struct minefield_t *mf, int c1, int r1, int c2, int r2)
 {
-	return((abs(c1 - c2) <= 2) && (abs(r1 - r2) <= 2) &&
+	return (abs(c1 - c2) <= 2) && (abs(r1 - r2) <= 2) &&
 	       (is_cleared_neighbour_of(mf, c1-1, r1-1, c2, r2) ||
 	        is_cleared_neighbour_of(mf, c1  , r1-1, c2, r2) ||
 	        is_cleared_neighbour_of(mf, c1+1, r1-1, c2, r2) ||
@@ -204,7 +204,7 @@ static int are_dependant(struct minefield_t *mf, int c1, int r1, int c2, int r2)
 	        is_cleared_neighbour_of(mf, c1+1, r1+1, c2, r2) ||
 	        is_cleared_neighbour_of(mf, c1  , r1+1, c2, r2) ||
 	        is_cleared_neighbour_of(mf, c1-1, r1+1, c2, r2) ||
-	        is_cleared_neighbour_of(mf, c1-1, r1  , c2, r2)));
+	        is_cleared_neighbour_of(mf, c1-1, r1  , c2, r2));
 }
 
 
@@ -253,7 +253,7 @@ static struct mine_list_t *join_mine_lists(struct mine_list_t *list_a, struct mi
 		list_b->next->prev = prev;
 	free(list_b);
 
-	return(prev);
+	return prev;
 }
 
 static void add_possible_mine(struct minefield_t *mf, int col, int row, struct mine_lists_t *mine_lists)
@@ -310,8 +310,8 @@ static int is_possible_mine(int col, int row, struct mine_lists_t *mine_lists)
 	for(list = mine_lists->first; list; list = list->next)
 		for(i = 0, cell = list->cell; i < list->length; i++, cell++)
 			if(cell->col == col && cell->row == row)
-				return(TRUE);
-	return(FALSE);
+				return TRUE;
+	return FALSE;
 }
 
 
@@ -334,7 +334,7 @@ static int find_possible_mines(struct minefield_t *mf, struct mine_lists_t *mine
 		for(row = 1; row <= mf->rows; row++)
 			if(IS_UNMARKED(mf, col, row) && (for_each_neighbour(mf, col, row, IS_CLEARED, ||)))
 				add_possible_mine(mf, col, row, mine_lists);
-	return(mine_lists->first != NULL);
+	return mine_lists->first != NULL;
 }
 
 
@@ -350,12 +350,12 @@ static int find_possible_mines(struct minefield_t *mf, struct mine_lists_t *mine
 
 static int unmarked_neighbours_must_be_cleared(struct minefield_t *mf, int col, int row)
 {
-	return(minefield_cell(mf, col, row)->is_cleared && (FLAGSAROUND(mf, col, row) == minefield_cell(mf, col, row)->minesaround));
+	return minefield_cell(mf, col, row)->is_cleared && (FLAGSAROUND(mf, col, row) == minefield_cell(mf, col, row)->minesaround);
 }
 
 static int unmarked_neighbours_must_be_flagged(struct minefield_t *mf, int col, int row)
 {
-	return(minefield_cell(mf, col, row)->is_cleared && (AVAILAROUND(mf, col, row) == minefield_cell(mf, col, row)->minesaround));
+	return minefield_cell(mf, col, row)->is_cleared && (AVAILAROUND(mf, col, row) == minefield_cell(mf, col, row)->minesaround);
 }
 
 static int optimize_list(struct minefield_t *mf, struct mine_list_t *list)
@@ -372,7 +372,7 @@ static int optimize_list(struct minefield_t *mf, struct mine_list_t *list)
 		}
 	}
 
-	return(found);
+	return found;
 }
 
 
@@ -398,12 +398,12 @@ static int optimize_list(struct minefield_t *mf, struct mine_list_t *list)
 
 static int not_enough_flagged(struct minefield_t *mf, int col, int row)
 {
-	return(!minefield_cell(mf, col, row)->is_cleared || (FLAGSAROUND(mf, col, row) < minefield_cell(mf, col, row)->minesaround));
+	return !minefield_cell(mf, col, row)->is_cleared || (FLAGSAROUND(mf, col, row) < minefield_cell(mf, col, row)->minesaround);
 }
 
 static int not_enough_cleared(struct minefield_t *mf, int col, int row)
 {
-	return(!minefield_cell(mf, col, row)->is_cleared || (AVAILAROUND(mf, col, row) > minefield_cell(mf, col, row)->minesaround));
+	return !minefield_cell(mf, col, row)->is_cleared || (AVAILAROUND(mf, col, row) > minefield_cell(mf, col, row)->minesaround);
 }
 
 static int _analyze_list(struct minefield_t *mf, struct mine_list_t *list, struct possible_mine_t *cell, int flags_used)
@@ -421,15 +421,15 @@ static int _analyze_list(struct minefield_t *mf, struct mine_list_t *list, struc
 
 	if(cell - list->cell == list->length) {
 		if(mf->needed)
-			return(-1);
+			return -1;
 		if(mf->mines - mf->flags - flags_used > mf->unmarked - list->length)
-			return(0);
+			return 0;
 		if(flags_used < list->min_flags)
 			list->min_flags = flags_used;
 		if(flags_used > list->max_flags)
 			list->max_flags = flags_used;
 		list->sum_flags += flags_used;
-		return(1);
+		return 1;
 	}
 
 	/*
@@ -446,7 +446,7 @@ static int _analyze_list(struct minefield_t *mf, struct mine_list_t *list, struc
 		result = _analyze_list(mf, list, cell+1, flags_used+1);
 		minefield_cell(mf, cell->col, cell->row)->is_flagged = 0;
 		if(result < 0)
-			return(result);
+			return result;
 		cell->flag_placements += result;
 		arrangements += result;
 	}
@@ -465,16 +465,16 @@ static int _analyze_list(struct minefield_t *mf, struct mine_list_t *list, struc
 		result = _analyze_list(mf, list, cell+1, flags_used);
 		minefield_cell(mf, cell->col, cell->row)->is_unavailable = 0;
 		if(result < 0)
-			return(result);
+			return result;
 		arrangements += result;
 	}
 
-	return(arrangements);
+	return arrangements;
 }
 
 static int analyze_list(struct minefield_t *mf, struct mine_list_t *list)
 {
-	return(_analyze_list(mf, list, list->cell, 0));
+	return _analyze_list(mf, list, list->cell, 0);
 }
 
 
@@ -494,13 +494,13 @@ static int analyze_possible_mines(struct minefield_t *mf, struct mine_lists_t *m
 		optimize_list(mf, list);
 		list->arrangements = analyze_list(mf, list);
 		if(list->arrangements < 0)
-			return(list->arrangements);
+			return list->arrangements;
 		mine_lists->min_flags += list->min_flags;
 		mine_lists->max_flags += list->max_flags;
 	}
 
 	if(mf->flags + mine_lists->max_flags <= mf->mines)
-		return(1);
+		return 1;
 
 	/*
 	 * Some of the arrangements found would result in more flags being
@@ -543,7 +543,7 @@ static int analyze_possible_mines(struct minefield_t *mf, struct mine_lists_t *m
 	mine_lists->min_flags += retry_list->min_flags;
 	mine_lists->max_flags += retry_list->max_flags;
 
-	return(retry_list->arrangements);
+	return retry_list->arrangements;
 }
 
 
@@ -570,7 +570,7 @@ static int check_nonborder_sites(struct minefield_t *mf, struct mine_lists_t *mi
 	else if(mf->mines - mf->flags - mine_lists->max_flags == mf->unmarked - mine_lists->length)
 		action = flag;
 	else
-		return(FALSE);
+		return FALSE;
 
 	for(col = 1; col <= mf->cols; col++)
 		for(row = 1; row <= mf->rows; row++)
@@ -578,7 +578,7 @@ static int check_nonborder_sites(struct minefield_t *mf, struct mine_lists_t *mi
 				computer_move(mf, col, row, action);
 				made_moves = TRUE;
 			}
-	return(made_moves);
+	return made_moves;
 }
 
 
@@ -611,7 +611,7 @@ static int play_moves(struct minefield_t *mf, struct mine_lists_t *mine_lists)
 		}
 	}
 
-	return(made_moves);
+	return made_moves;
 }
 
 
@@ -747,7 +747,7 @@ static enum status_t solve_minefield(struct minefield_t *mf, int do_full_analysi
 
 	free_mine_lists(&mine_lists);
 
-	return(result);
+	return result;
 }
 
 
@@ -782,7 +782,7 @@ static void local_pre_game(struct minefield_t *mf, unsigned int number)
 
 static int searching_must_stop(struct minefield_t *mf)
 {
-	return(state.won || state.lost || (state.search_status == guess) || (state.search_status == stopped) || mf->needed);
+	return state.won || state.lost || (state.search_status == guess) || (state.search_status == stopped) || mf->needed;
 }
 
 void *autoplay(void *nul)

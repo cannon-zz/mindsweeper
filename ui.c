@@ -106,7 +106,7 @@ static gint focus_change(GtkWidget *widget, GdkEvent *event, gpointer data)
 		gtk_widget_hide(GTK_WIDGET(gameboard));
 	else
 		gtk_widget_show(GTK_WIDGET(gameboard));
-	return(FALSE);
+	return FALSE;
 }
 
 
@@ -209,24 +209,24 @@ void ui_update_status(enum status_t status)
 	else if(!settings.analysis)
 		gtk_pixmap_set(GTK_PIXMAP(status_img), noanalysis_pixmap, NULL);
 	else if(!state.won && !state.lost)
-		 switch(status) {
-			case stopped:
+		switch(status) {
+		case stopped:
 			gtk_pixmap_set(GTK_PIXMAP(status_img), stopped_pixmap, NULL);
 			break;
 
-			case searching:
+		case searching:
 			gtk_pixmap_set(GTK_PIXMAP(status_img), searching_pixmap, NULL);
 			break;
 
-			case guess:
+		case guess:
 			gtk_pixmap_set(GTK_PIXMAP(status_img), guess_pixmap, NULL);
 			break;
 
-			case noguess:
+		case noguess:
 			gtk_pixmap_set(GTK_PIXMAP(status_img), noguess_pixmap, NULL);
 			break;
 
-			case gameover:
+		case gameover:
 			break;
 		}
 }
@@ -384,7 +384,7 @@ static gint settings_handler(GtkWidget *widget, gpointer action)
 		 * Create the window
 		 */
 
-		case settings_act_create:
+	case settings_act_create:
 		if(window_settings) {
 			gdk_window_raise(window_settings->window);
 			break;
@@ -540,7 +540,7 @@ static gint settings_handler(GtkWidget *widget, gpointer action)
 		 * Window being destroyed
 		 */
 
-		case settings_act_destroy:
+	case settings_act_destroy:
 		window_settings = NULL;
 		break;
 
@@ -549,7 +549,7 @@ static gint settings_handler(GtkWidget *widget, gpointer action)
 		 * Ok/Cancel buttons pressed
 		 */
 
-		case settings_act_ok:
+	case settings_act_ok:
 		settings.open = GTK_TOGGLE_BUTTON(open)->active;
 		settings.analysis = GTK_TOGGLE_BUTTON(analysis)->active;
 		settings.show_probability = GTK_TOGGLE_BUTTON(probabilities)->active;
@@ -570,7 +570,7 @@ static gint settings_handler(GtkWidget *widget, gpointer action)
 		minefield.number = atoi(gtk_entry_get_text(GTK_ENTRY(number)));
 		local_pre_game(NULL, &minefield.number);
 
-		case settings_act_cancel:
+	case settings_act_cancel:
 		gtk_widget_destroy(GTK_WIDGET(window_settings));
 		break;
 
@@ -579,19 +579,19 @@ static gint settings_handler(GtkWidget *widget, gpointer action)
 		 * Preset layout selected
 		 */
 
-		case settings_act_beg:
+	case settings_act_beg:
 		board_size_presets(rows, cols, mines, BEGINNER);
 		break;
 
-		case settings_act_int:
+	case settings_act_int:
 		board_size_presets(rows, cols, mines, INTERMEDIATE);
 		break;
 
-		case settings_act_adv:
+	case settings_act_adv:
 		board_size_presets(rows, cols, mines, EXPERT);
 		break;
 
-		case settings_act_bob:
+	case settings_act_bob:
 		board_size_presets(rows, cols, mines, BOBBY);
 		break;
 
@@ -600,7 +600,7 @@ static gint settings_handler(GtkWidget *widget, gpointer action)
 		 * Mine density changed
 		 */
 
-		case settings_act_density:
+	case settings_act_density:
 		GTK_ADJUSTMENT(mines)->upper = GTK_ADJUSTMENT(rows)->value* GTK_ADJUSTMENT(cols)->value*MAX_DENSITY;
 		gtk_adjustment_changed(GTK_ADJUSTMENT(mines));
 		display_mine_density(mines_label, 100.0*GTK_ADJUSTMENT(mines)->value/(GTK_ADJUSTMENT(rows)->value*GTK_ADJUSTMENT(cols)->value));
@@ -611,7 +611,7 @@ static gint settings_handler(GtkWidget *widget, gpointer action)
 		 * Game board analysis mode changed
 		 */
 
-		case settings_game_analysis:
+	case settings_game_analysis:
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(probabilities), settings.show_probability && GTK_TOGGLE_BUTTON(analysis)->active);
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(autoplay), settings.autoplay && GTK_TOGGLE_BUTTON(analysis)->active);
 		gtk_widget_set_sensitive(GTK_WIDGET(probabilities), GTK_TOGGLE_BUTTON(analysis)->active);
@@ -619,7 +619,7 @@ static gint settings_handler(GtkWidget *widget, gpointer action)
 		break;
 	}
 
-	return(FALSE);
+	return FALSE;
 }
 
 
@@ -635,7 +635,7 @@ static gint about_message(GtkWidget *widget, gpointer data)
 	if(window != NULL) {
 		gtk_widget_destroy(GTK_WIDGET(window));
 		window = NULL;
-		return(FALSE);
+		return FALSE;
 	}
 
 	window = gtk_dialog_new();
@@ -662,7 +662,7 @@ static gint about_message(GtkWidget *widget, gpointer data)
 
 	gtk_widget_show_all(window);
 
-	return(FALSE);
+	return FALSE;
 }
 
 

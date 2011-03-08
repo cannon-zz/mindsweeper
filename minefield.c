@@ -105,19 +105,19 @@ gint MineFieldMinCellSize = 15;
 
 static MineFieldState *cell_state(MineField *minefield, gint row, gint column)
 {
-	return(&minefield->cell[row*minefield->columns + column]);
+	return &minefield->cell[row*minefield->columns + column];
 }
 
 
 static gfloat *cell_probability(MineField *minefield, gint row, gint column)
 {
-	return(&minefield->probability[row*minefield->columns + column]);
+	return &minefield->probability[row*minefield->columns + column];
 }
 
 
 static PangoLayout **minefield_numeral(MineField *minefield, gint n)
 {
-	return(&minefield->numeral[n - 1]);
+	return &minefield->numeral[n - 1];
 }
 
 
@@ -192,23 +192,23 @@ static void paint_cell(MineField *minefield, gint row, gint column, GdkRectangle
 	/* Draw the cell's outline */
 
 	switch(state) {
-		case MINEFIELD_MINES_0:
-		case MINEFIELD_MINES_1:
-		case MINEFIELD_MINES_2:
-		case MINEFIELD_MINES_3:
-		case MINEFIELD_MINES_4:
-		case MINEFIELD_MINES_5:
-		case MINEFIELD_MINES_6:
-		case MINEFIELD_MINES_7:
-		case MINEFIELD_MINES_8:
-		case MINEFIELD_MINED:
-		case MINEFIELD_BOOM:
-		case MINEFIELD_WRONG:
+	case MINEFIELD_MINES_0:
+	case MINEFIELD_MINES_1:
+	case MINEFIELD_MINES_2:
+	case MINEFIELD_MINES_3:
+	case MINEFIELD_MINES_4:
+	case MINEFIELD_MINES_5:
+	case MINEFIELD_MINES_6:
+	case MINEFIELD_MINES_7:
+	case MINEFIELD_MINES_8:
+	case MINEFIELD_MINED:
+	case MINEFIELD_BOOM:
+	case MINEFIELD_WRONG:
 		gtk_paint_box(widget->style, widget->window, GTK_WIDGET_STATE(widget), GTK_SHADOW_NONE, area, widget, NULL, x, y, width, height);
 		break;
 
-		case MINEFIELD_FLAGGED:
-		case MINEFIELD_UNMARKED:
+	case MINEFIELD_FLAGGED:
+	case MINEFIELD_UNMARKED:
 		gtk_paint_box(widget->style, widget->window, GTK_WIDGET_STATE(widget), GTK_SHADOW_OUT, area, widget, NULL, x, y, width, height);
 		break;
 	}
@@ -216,25 +216,25 @@ static void paint_cell(MineField *minefield, gint row, gint column, GdkRectangle
 	/* Draw the cell's contents */
 
 	switch(state) {
-		case MINEFIELD_MINES_1:
-		case MINEFIELD_MINES_2:
-		case MINEFIELD_MINES_3:
-		case MINEFIELD_MINES_4:
-		case MINEFIELD_MINES_5:
-		case MINEFIELD_MINES_6:
-		case MINEFIELD_MINES_7:
-		case MINEFIELD_MINES_8:
+	case MINEFIELD_MINES_1:
+	case MINEFIELD_MINES_2:
+	case MINEFIELD_MINES_3:
+	case MINEFIELD_MINES_4:
+	case MINEFIELD_MINES_5:
+	case MINEFIELD_MINES_6:
+	case MINEFIELD_MINES_7:
+	case MINEFIELD_MINES_8:
 		paint_numeral(minefield, state - MINEFIELD_MINES_0, x, y, width, height, area);
 		break;
 
-		case MINEFIELD_BOOM:
-		case MINEFIELD_FLAGGED:
-		case MINEFIELD_MINED:
-		case MINEFIELD_WRONG:
+	case MINEFIELD_BOOM:
+	case MINEFIELD_FLAGGED:
+	case MINEFIELD_MINED:
+	case MINEFIELD_WRONG:
 		paint_pixmap(minefield, pixmap[state - MINEFIELD_BOOM], mask[state - MINEFIELD_BOOM], x, y, width, height, area);
 		break;
 
-		default:
+	default:
 		break;
 	}
 }
@@ -364,7 +364,7 @@ static gboolean button_press_release_event(GtkWidget *widget, GdkEventButton *ev
 
 	gtk_signal_emit(GTK_OBJECT(widget), minefield_signal[MINEFIELD_ACTION], event);
 
-	return(FALSE);
+	return FALSE;
 }
 
 
@@ -378,7 +378,7 @@ static gboolean destroy_event(GtkWidget *widget, GdkEventAny *event)
 	gtk_widget_destroy(GTK_WIDGET(minefield->cell_tips));
 
 	/* FIXME: need to chain? */
-	return(GTK_WIDGET_CLASS(parent_class)->destroy_event(widget, event));
+	return GTK_WIDGET_CLASS(parent_class)->destroy_event(widget, event);
 }
 
 
@@ -398,19 +398,19 @@ static gboolean expose_event(GtkWidget *widget, GdkEventExpose *event)
 				paint_cell(minefield, i, j, NULL);
 	}
 
-	return(FALSE);
+	return FALSE;
 }
 
 
 static gboolean key_press_event(GtkWidget *widget, GdkEventKey *event)
 {
-	return(FALSE);
+	return FALSE;
 }
 
 
 static gboolean key_release_event(GtkWidget *widget, GdkEventKey *event)
 {
-	return(FALSE);
+	return FALSE;
 }
 
 
@@ -426,7 +426,7 @@ static gboolean motion_notify_event(GtkWidget *widget, GdkEventMotion *event)
 		paint_probability(minefield, row, column);
 	}
 
-	return(FALSE);
+	return FALSE;
 }
 
 
@@ -522,7 +522,7 @@ guint minefield_get_type(void)
 		minefield_type = gtk_type_unique(gtk_widget_get_type(), &minefield_info);
 	}
 
-	return(minefield_type);
+	return minefield_type;
 }
 
 
@@ -556,7 +556,7 @@ MineFieldState minefield_get_state(MineField *minefield, gint row, gint column)
 {
 	g_return_val_if_fail(IS_MINEFIELD(minefield) && row >= 1 && row <= minefield->rows && column >= 1 && column <= minefield->columns, MINEFIELD_UNMARKED);
 
-	return(*cell_state(minefield, row - 1, column - 1));
+	return *cell_state(minefield, row - 1, column - 1);
 }
 
 
@@ -582,7 +582,7 @@ gfloat minefield_get_probability(MineField *minefield, gint row, gint column)
 {
 	g_return_val_if_fail(IS_MINEFIELD(minefield) && row >= 1 && row <= minefield->rows && column >= 1 && column <= minefield->columns, -1.0);
 
-	return(*cell_probability(minefield, row - 1, column - 1));
+	return *cell_probability(minefield, row - 1, column - 1);
 }
 
 
@@ -601,7 +601,7 @@ gint minefield_get_probabilities_visible(MineField *minefield)
 {
 	g_return_val_if_fail(IS_MINEFIELD(minefield), 0);
 
-	return(minefield->cell_tips->enabled);
+	return minefield->cell_tips->enabled;
 }
 
 
@@ -655,7 +655,7 @@ gint minefield_get_cell_size(MineField *minefield)
 {
 	g_return_val_if_fail(IS_MINEFIELD(minefield), 0);
 
-	return(minefield->cell_size);
+	return minefield->cell_size;
 }
 
 
@@ -698,5 +698,5 @@ MineField *minefield_new(gint rows, gint columns)
 	if(minefield)
 		set_board_size(minefield, rows, columns);
 
-	return(minefield);
+	return minefield;
 }

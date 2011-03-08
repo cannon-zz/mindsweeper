@@ -92,47 +92,47 @@ int main(int argc, char *argv[])
 #endif
 					)) != EOF)
 		switch(opt) {
-			case 'a':
+		case 'a':
 			settings.autoplay = TRUE;
 			break;
 
 #ifdef DIAGNOSTICS
-			case 'l':
+		case 'l':
 			settings.logmode = TRUE;
 			break;
 #endif
 
-			case 'o':
+		case 'o':
 			settings.open = TRUE;
 			break;
 
-			case 'p':
+		case 'p':
 			settings.pause_when_unfocused = TRUE;
 			break;
 
-			case 'r':
+		case 'r':
 			minefield.rows = atoi(optarg);
 			break;
 
-			case 'c':
+		case 'c':
 			minefield.cols = atoi(optarg);
 			break;
 
 #ifdef DIAGNOSTICS
-			case 'g':
+		case 'g':
 			stats.total_games = atoi(optarg);
 			break;
 #endif
 
-			case 'm':
+		case 'm':
 			minefield.mines = atoi(optarg);
 			break;
 
-			case 'n':
+		case 'n':
 			minefield.number = atoi(optarg);
 			break;
 
-			case 'h':
+		case 'h':
 			default:
 			printf("Usage: %s [options]\nOptions:\n"
 			       "\t--diplay display   use specified display\n"
