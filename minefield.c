@@ -82,6 +82,7 @@
 #define COLOURS_RED	XDEMINEUR_COLOURS_RED
 #define COLOURS_GREEN	XDEMINEUR_COLOURS_GREEN
 #define COLOURS_BLUE	XDEMINEUR_COLOURS_BLUE
+#define MAX_CELL_SIZE  40
 
 
 /*
@@ -292,24 +293,13 @@ static void free_numerals(MineField *minefield)
 
 
 /*
- * Widget basics
+ * ============================================================================
+ *
+ *                          Widget Method Overrides
+ *
+ * ============================================================================
  */
 
-static void show(GtkWidget *widget)
-{
-}
-
-static void hide(GtkWidget *widget)
-{
-}
-
-static void map(GtkWidget *widget)
-{
-}
-
-static void unmap(GtkWidget *widget)
-{
-}
 
 static void realize(GtkWidget *widget)
 {
@@ -337,6 +327,7 @@ static void realize(GtkWidget *widget)
 	gtk_style_set_background(widget->style, widget->window, GTK_STATE_NORMAL);
 }
 
+
 static void size_request(GtkWidget *widget, GtkRequisition *requisition)
 {
 	MineField  *minefield = MINEFIELD(widget);
@@ -345,14 +336,6 @@ static void size_request(GtkWidget *widget, GtkRequisition *requisition)
 	requisition->height = minefield->rows * minefield->cell_size;
 }
 
-static void size_allocate(GtkWidget *widget, GtkAllocation *allocation)
-{
-}
-
-
-/*
- * Widget events
- */
 
 static gboolean button_press_release_event(GtkWidget *widget, GdkEventButton *event)
 {
@@ -402,18 +385,6 @@ static gboolean expose_event(GtkWidget *widget, GdkEventExpose *event)
 }
 
 
-static gboolean key_press_event(GtkWidget *widget, GdkEventKey *event)
-{
-	return FALSE;
-}
-
-
-static gboolean key_release_event(GtkWidget *widget, GdkEventKey *event)
-{
-	return FALSE;
-}
-
-
 static gboolean motion_notify_event(GtkWidget *widget, GdkEventMotion *event)
 {
 	MineField  *minefield = MINEFIELD(widget);
@@ -431,11 +402,65 @@ static gboolean motion_notify_event(GtkWidget *widget, GdkEventMotion *event)
 
 
 /*
- * Widget class infrastructure
+ * ============================================================================
+ *
+ *                                 Properties
+ *
+ * ============================================================================
  */
+
+
+enum property {
+	ARG_CELL_SIZE = 1
+};
+
+
+static void set_property(GObject *object, enum property id, const GValue *value, GParamSpec *pspec)
+{
+	MineField *minefield = MINEFIELD(object);
+
+	switch(id) {
+	case ARG_CELL_SIZE: {
+		gint size = g_value_get_int(value);
+		g_return_if_fail(size >= MineFieldMinCellSize);
+		if(minefield->cell_size != size) {
+			minefield->cell_size = size;
+			free_numerals(minefield);
+			construct_numerals(minefield);
+			gtk_widget_queue_resize(GTK_WIDGET(minefield));
+		}
+		break;
+	}
+
+	}
+}
+
+
+static void get_property(GObject *object, enum property id, GValue *value, GParamSpec *pspec)
+{
+	MineField *minefield = MINEFIELD(object);
+
+	switch(id) {
+	case ARG_CELL_SIZE:
+		g_value_set_int(value, minefield->cell_size);
+		break;
+
+	}
+}
+
+
+/*
+ * ============================================================================
+ *
+ *                          Object Method Overrides
+ *
+ * ============================================================================
+ */
+
 
 static void class_init(MineFieldClass *klass)
 {
+	GObjectClass *object_class = G_OBJECT_CLASS(klass);
 	GtkWidgetClass *widget_class = GTK_WIDGET_CLASS(klass);
 	GdkColormap  *colourmap;
 	gint  i, width, height;
@@ -455,7 +480,6 @@ static void class_init(MineFieldClass *klass)
 			MineFieldMinCellSize = height;
 	}
 
-
 	/*
 	 * Signals
 	 */
@@ -474,7 +498,26 @@ static void class_init(MineFieldClass *klass)
 	);
 
 	/*
-	 * Event Handlers
+	 * Object methods
+	 */
+
+	object_class->set_property = set_property;
+	object_class->get_property = get_property;
+
+	g_object_class_install_property(
+		object_class,
+		ARG_CELL_SIZE,
+		g_param_spec_int(
+			"cell-size",
+			"cell size",
+			"Size of each minefield cell in pixels.",
+			MineFieldMinCellSize, MAX_CELL_SIZE, MineFieldMinCellSize,
+			G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS
+		)
+	);
+
+	/*
+	 * Widget methods
 	 */
 
 	parent_class = g_type_class_peek_parent(klass);
@@ -508,6 +551,15 @@ static void object_init(MineField *minefield)
 }
 
 
+/*
+ * ============================================================================
+ *
+ *                                Entry Point
+ *
+ * ============================================================================
+ */
+
+
 guint minefield_get_type(void)
 {
 	static guint minefield_type = 0;
@@ -529,8 +581,13 @@ guint minefield_get_type(void)
 
 
 /*
- * Application interface:  set/get the state of a cell.
+ * ============================================================================
+ *
+ *                              Exported Methods
+ *
+ * ============================================================================
  */
+
 
 static void set_state(MineField *minefield, gint row, gint column, MineFieldState state)
 {
@@ -565,6 +622,7 @@ MineFieldState minefield_get_state(MineField *minefield, gint row, gint column)
 /*
  * Application interface:  get/set mine probabilities
  */
+
 
 static void set_probability(MineField *minefield, gint row, gint column, gfloat probability)
 {
@@ -611,6 +669,7 @@ gint minefield_get_probabilities_visible(MineField *minefield)
  * Application interface:  reset the game board
  */
 
+
 static void reset(MineField *minefield)
 {
 	gint  row, col;
@@ -634,31 +693,6 @@ void minefield_reset(MineField *minefield)
 /*
  * Application interface:  adjust the size of a minefield.
  */
-
-static void set_cell_size(MineField *minefield, gint size)
-{
-	if(minefield->cell_size != size) {
-		minefield->cell_size = size;
-		free_numerals(minefield);
-		construct_numerals(minefield);
-		gtk_widget_queue_resize(GTK_WIDGET(minefield));
-	}
-}
-
-
-void minefield_set_cell_size(MineField *minefield, gint size)
-{
-	g_return_if_fail(IS_MINEFIELD(minefield) && size >= MineFieldMinCellSize);
-
-	set_cell_size(minefield, size);
-}
-
-gint minefield_get_cell_size(MineField *minefield)
-{
-	g_return_val_if_fail(IS_MINEFIELD(minefield), 0);
-
-	return minefield->cell_size;
-}
 
 
 static void set_board_size(MineField *minefield, gint rows, gint columns)
@@ -691,6 +725,7 @@ void minefield_set_board_size(MineField *minefield, gint rows, gint columns)
 /*
  * Application interface:  create a new minefield
  */
+
 
 MineField *minefield_new(gint rows, gint columns)
 {

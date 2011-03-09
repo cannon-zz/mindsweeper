@@ -33,11 +33,11 @@
  * Pixmap files
  */
 
-/* the const hack changes the delcaration inside about.xml from
+/* the const hack changes the delcaration inside each .xpm from
  *	static char *blah[]
  * to
  *	const static char *blah[] 
- * which silences an incompatible pointer warning */
+ * which silences an "incompatible pointer" warning */
 const
 #include "pixmaps/about.xpm"
 const
@@ -81,7 +81,6 @@ const
 #define  MINE_DIGITS  4
 #define  TIME_DIGITS  4
 #define  SPACING  5
-#define  MAX_CELL_SIZE  40
 
 static MineField  *gameboard;
 static GdkPixbuf  *digit_pixbuf[10];
@@ -474,7 +473,13 @@ static gint settings_handler(GtkObject *object, gpointer action)
 		widget = gtk_label_new("Cell Size");
 		gtk_table_attach_defaults(GTK_TABLE(table), widget, 0, 1, 3, 4);
 
-		cell_size = gtk_adjustment_new(minefield_get_cell_size(gameboard), MineFieldMinCellSize, MAX_CELL_SIZE, 1.0, 1.0, 0.0);
+		{
+		GParamSpecInt *cell_size_param = G_PARAM_SPEC_INT(g_object_class_find_property(G_OBJECT_GET_CLASS(gameboard), "cell-size"));
+		gint minefield_cell_size;
+		g_object_get(G_OBJECT(gameboard), "cell-size", &minefield_cell_size, NULL);
+		cell_size = gtk_adjustment_new(minefield_cell_size, cell_size_param->minimum, cell_size_param->maximum, 1.0, 1.0, 0.0);
+		/* FIXME:  g_param_spec_unref(cell_size_param); ? */
+		}
 		widget = gtk_hscale_new(GTK_ADJUSTMENT(cell_size));
 		gtk_scale_set_digits(GTK_SCALE(widget), 0);
 		gtk_range_set_update_policy(GTK_RANGE(widget), GTK_UPDATE_DISCONTINUOUS);
@@ -571,7 +576,7 @@ static gint settings_handler(GtkObject *object, gpointer action)
 			minefield_set_board_size(gameboard, minefield.rows, minefield.cols);
 		}
 		minefield.mines = GTK_ADJUSTMENT(mines)->value;
-		minefield_set_cell_size(gameboard, GTK_ADJUSTMENT(cell_size)->value);
+		g_object_set(G_OBJECT(gameboard), "cell-size", (gint) GTK_ADJUSTMENT(cell_size)->value, NULL);
 		minefield.number = atoi(gtk_entry_get_text(GTK_ENTRY(number)));
 		local_pre_game(NULL, &minefield.number);
 

@@ -84,8 +84,6 @@ typedef struct {
 guint minefield_get_type(void);
 MineField *minefield_new(gint, gint);
 void minefield_reset(MineField *);
-void minefield_set_cell_size(MineField *, gint);
-gint minefield_get_cell_size(MineField *);
 void minefield_set_board_size(MineField *, gint, gint);
 void minefield_set_state(MineField *, gint, gint, MineFieldState);
 void minefield_set_probability(MineField *, gint, gint, gfloat);
