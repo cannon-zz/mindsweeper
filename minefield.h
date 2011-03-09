@@ -85,9 +85,9 @@ guint minefield_get_type(void);
 MineField *minefield_new(gint, gint);
 void minefield_reset(MineField *);
 void minefield_set_state(MineField *, gint, gint, MineFieldState);
+MineFieldState minefield_get_state(MineField *, gint, gint);
 void minefield_set_probability(MineField *, gint, gint, gfloat);
 gfloat minefield_get_probability(MineField *, gint, gint);
-MineFieldState minefield_get_state(MineField *, gint, gint);
 
 
 #endif /* _MINEFIELD_H_ */

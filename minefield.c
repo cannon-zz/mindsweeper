@@ -29,8 +29,6 @@
  * #include "minefield.h"
  *
  * MineField *minefield_new(gint rows, gint columns);
- * void minefield_set_cell_size(MineField *minefield, gint size);
- * void minefield_set_board_size(MineField *minefield, gint rows, gint columns);
  * void minefield_set_state(MineField *minefield, gint row, gint column,
  *                          MineFieldState state);
  * MineFieldState minefield_get_state(MineField *minefield, gint row,
@@ -331,7 +329,6 @@ static void set_board_size(MineField *minefield, gint rows, gint columns)
 		free_cells(minefield);
 		free_probabilities(minefield);
 		minefield->cell = calloc(rows * columns, sizeof(*minefield->cell));
-		/*g_return_if_fail(minefield->cell != NULL);*/
 		minefield->probability = malloc(rows * columns * sizeof(*minefield->probability));
 		minefield->rows = rows;
 		minefield->columns = columns;
@@ -762,7 +759,7 @@ MineField *minefield_new(gint rows, gint columns)
 
 	minefield = gtk_type_new(minefield_get_type());
 	if(minefield)
-		set_board_size(minefield, rows, columns);
+		g_object_set(G_OBJECT(minefield), "rows", rows, "columns", columns, NULL);
 
 	return minefield;
 }
