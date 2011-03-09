@@ -97,7 +97,6 @@ static guint minefield_signal[1] = { 0 } ;      /* signal array */
 static GdkPixmap *pixmap[4];                    /* pixmaps for playing field */
 static GdkBitmap *mask[4];                      /* clip masks for pictures */
 static GtkFixedClass *parent_class = NULL;	/* parent class */
-gint MineFieldMinCellSize = 15;
 
 
 /*
@@ -292,6 +291,58 @@ static void free_numerals(MineField *minefield)
 }
 
 
+static void set_state(MineField *minefield, gint row, gint column, MineFieldState state)
+{
+	MineFieldState  *current_state = cell_state(minefield, row, column);
+	gint  cell_size = minefield->cell_size;
+	gint  x = column * cell_size;
+	gint  y = row * cell_size;
+
+	if(*current_state != state) {
+		*current_state = state;
+		gtk_widget_queue_draw_area(GTK_WIDGET(minefield), x, y, cell_size, cell_size);
+	}
+}
+
+
+static void set_probability(MineField *minefield, gint row, gint column, gfloat probability)
+{
+	*cell_probability(minefield, row, column) = probability;
+}
+
+
+static void reset(MineField *minefield)
+{
+	gint  row, col;
+
+	for(row = 0; row < minefield->rows; row++)
+		for(col = 0; col < minefield->columns; col++) {
+			set_state(minefield, row, col, MINEFIELD_UNMARKED);
+			set_probability(minefield, row, col, -1.0);
+		}
+}
+
+
+static void set_board_size(MineField *minefield, gint rows, gint columns)
+{
+	if((minefield->rows != rows) || (minefield->columns != columns)) {
+		minefield->rows = 0;
+		minefield->columns = 0;
+		free_cells(minefield);
+		free_probabilities(minefield);
+		minefield->cell = calloc(rows * columns, sizeof(*minefield->cell));
+		/*g_return_if_fail(minefield->cell != NULL);*/
+		minefield->probability = malloc(rows * columns * sizeof(*minefield->probability));
+		minefield->rows = rows;
+		minefield->columns = columns;
+
+		gtk_widget_queue_resize(GTK_WIDGET(minefield));
+	}
+
+	reset(minefield);
+}
+
+
 /*
  * ============================================================================
  *
@@ -411,7 +462,10 @@ static gboolean motion_notify_event(GtkWidget *widget, GdkEventMotion *event)
 
 
 enum property {
-	ARG_CELL_SIZE = 1
+	ARG_CELL_SIZE = 1,
+	ARG_ROWS,
+	ARG_COLUMNS,
+	ARG_PROBABILITIES_VISIBLE
 };
 
 
@@ -422,7 +476,6 @@ static void set_property(GObject *object, enum property id, const GValue *value,
 	switch(id) {
 	case ARG_CELL_SIZE: {
 		gint size = g_value_get_int(value);
-		g_return_if_fail(size >= MineFieldMinCellSize);
 		if(minefield->cell_size != size) {
 			minefield->cell_size = size;
 			free_numerals(minefield);
@@ -432,6 +485,20 @@ static void set_property(GObject *object, enum property id, const GValue *value,
 		break;
 	}
 
+	case ARG_ROWS:
+		set_board_size(minefield, g_value_get_int(value), minefield->columns);
+		break;
+
+	case ARG_COLUMNS:
+		set_board_size(minefield, minefield->rows, g_value_get_int(value));
+		break;
+
+	case ARG_PROBABILITIES_VISIBLE:
+		if(g_value_get_boolean(value))
+			gtk_tooltips_enable(minefield->cell_tips);
+		else
+			gtk_tooltips_disable(minefield->cell_tips);
+		break;
 	}
 }
 
@@ -445,6 +512,17 @@ static void get_property(GObject *object, enum property id, GValue *value, GPara
 		g_value_set_int(value, minefield->cell_size);
 		break;
 
+	case ARG_ROWS:
+		g_value_set_int(value, minefield->rows);
+		break;
+
+	case ARG_COLUMNS:
+		g_value_set_int(value, minefield->columns);
+		break;
+
+	case ARG_PROBABILITIES_VISIBLE:
+		g_value_set_boolean(value, minefield->cell_tips->enabled);
+		break;
 	}
 }
 
@@ -464,6 +542,7 @@ static void class_init(MineFieldClass *klass)
 	GtkWidgetClass *widget_class = GTK_WIDGET_CLASS(klass);
 	GdkColormap  *colourmap;
 	gint  i, width, height;
+	gint MineFieldMinCellSize = 15;
 
 	colourmap = gdk_colormap_get_system();
 
@@ -501,6 +580,8 @@ static void class_init(MineFieldClass *klass)
 	 * Object methods
 	 */
 
+	parent_class = g_type_class_peek_parent(klass);
+
 	object_class->set_property = set_property;
 	object_class->get_property = get_property;
 
@@ -512,15 +593,49 @@ static void class_init(MineFieldClass *klass)
 			"cell size",
 			"Size of each minefield cell in pixels.",
 			MineFieldMinCellSize, MAX_CELL_SIZE, MineFieldMinCellSize,
-			G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS
+			G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT
+		)
+	);
+
+	g_object_class_install_property(
+		object_class,
+		ARG_ROWS,
+		g_param_spec_int(
+			"rows",
+			"rows",
+			"Number of rows in minefield.",
+			0, G_MAXINT, 0,
+			G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT
+		)
+	);
+
+	g_object_class_install_property(
+		object_class,
+		ARG_COLUMNS,
+		g_param_spec_int(
+			"columns",
+			"columns",
+			"Number of columns in minefield.",
+			0, G_MAXINT, 0,
+			G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT
+		)
+	);
+
+	g_object_class_install_property(
+		object_class,
+		ARG_PROBABILITIES_VISIBLE,
+		g_param_spec_boolean(
+			"probabilities-visible",
+			"probabilities visible",
+			"Turn minefield probability tooltips on or off.",
+			FALSE,
+			G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT
 		)
 	);
 
 	/*
 	 * Widget methods
 	 */
-
-	parent_class = g_type_class_peek_parent(klass);
 
 	widget_class->realize = realize;
 	widget_class->size_request = size_request;
@@ -536,9 +651,6 @@ static void object_init(MineField *minefield)
 {
 	GTK_WIDGET_UNSET_FLAGS(minefield, GTK_NO_WINDOW);
 
-	minefield->cell_size = MineFieldMinCellSize;
-	minefield->rows = 0;
-	minefield->columns = 0;
 	minefield->tip_row = -1;
 	minefield->tip_column = -1;
 	minefield->cell = NULL;
@@ -589,20 +701,6 @@ guint minefield_get_type(void)
  */
 
 
-static void set_state(MineField *minefield, gint row, gint column, MineFieldState state)
-{
-	MineFieldState  *current_state = cell_state(minefield, row, column);
-	gint  cell_size = minefield->cell_size;
-	gint  x = column * cell_size;
-	gint  y = row * cell_size;
-
-	if(*current_state != state) {
-		*current_state = state;
-		gtk_widget_queue_draw_area(GTK_WIDGET(minefield), x, y, cell_size, cell_size);
-	}
-}
-
-
 void minefield_set_state(MineField *minefield, gint row, gint column, MineFieldState state)
 {
 	g_return_if_fail(IS_MINEFIELD(minefield) && row >= 1 && row <= minefield->rows && column >= 1 && column <= minefield->columns && state >= 0 && state <= MINEFIELD_WRONG);
@@ -624,12 +722,6 @@ MineFieldState minefield_get_state(MineField *minefield, gint row, gint column)
  */
 
 
-static void set_probability(MineField *minefield, gint row, gint column, gfloat probability)
-{
-	*cell_probability(minefield, row, column) = probability;
-}
-
-
 void minefield_set_probability(MineField *minefield, gint row, gint column, gfloat probability)
 {
 	g_return_if_fail(IS_MINEFIELD(minefield) && row >= 1 && row <= minefield->rows && column >= 1 && column <= minefield->columns && probability <= 1.0);
@@ -646,40 +738,9 @@ gfloat minefield_get_probability(MineField *minefield, gint row, gint column)
 }
 
 
-void minefield_set_probabilities_visible(MineField *minefield, gint truefalse)
-{
-	g_return_if_fail(IS_MINEFIELD(minefield));
-
-	if(truefalse)
-		gtk_tooltips_enable(minefield->cell_tips);
-	else
-		gtk_tooltips_disable(minefield->cell_tips);
-}
-
-
-gint minefield_get_probabilities_visible(MineField *minefield)
-{
-	g_return_val_if_fail(IS_MINEFIELD(minefield), 0);
-
-	return minefield->cell_tips->enabled;
-}
-
-
 /*
  * Application interface:  reset the game board
  */
-
-
-static void reset(MineField *minefield)
-{
-	gint  row, col;
-
-	for(row = 0; row < minefield->rows; row++)
-		for(col = 0; col < minefield->columns; col++) {
-			set_state(minefield, row, col, MINEFIELD_UNMARKED);
-			set_probability(minefield, row, col, -1.0);
-		}
-}
 
 
 void minefield_reset(MineField *minefield)
@@ -687,38 +748,6 @@ void minefield_reset(MineField *minefield)
 	g_return_if_fail(IS_MINEFIELD(minefield));
 
 	reset(minefield);
-}
-
-
-/*
- * Application interface:  adjust the size of a minefield.
- */
-
-
-static void set_board_size(MineField *minefield, gint rows, gint columns)
-{
-	if((minefield->rows != rows) || (minefield->columns != columns)) {
-		minefield->rows = 0;
-		minefield->columns = 0;
-		free_cells(minefield);
-		free_probabilities(minefield);
-		minefield->cell = calloc(rows * columns, sizeof(*minefield->cell));
-		g_return_if_fail(minefield->cell != NULL);
-		minefield->probability = malloc(rows * columns * sizeof(*minefield->probability));
-		minefield->rows = rows;
-		minefield->columns = columns;
-
-		gtk_widget_queue_resize(GTK_WIDGET(minefield));
-	}
-
-	reset(minefield);
-}
-
-void minefield_set_board_size(MineField *minefield, gint rows, gint columns)
-{
-	g_return_if_fail(IS_MINEFIELD(minefield));
-
-	set_board_size(minefield, rows, columns);
 }
 
 

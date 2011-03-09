@@ -563,7 +563,6 @@ static gint settings_handler(GtkObject *object, gpointer action)
 		settings.open = GTK_TOGGLE_BUTTON(open)->active;
 		settings.analysis = GTK_TOGGLE_BUTTON(analysis)->active;
 		settings.show_probability = GTK_TOGGLE_BUTTON(probabilities)->active;
-		minefield_set_probabilities_visible(gameboard, settings.analysis && settings.show_probability);
 		settings.autoplay = GTK_TOGGLE_BUTTON(autoplay)->active;
 		settings.pause_when_unfocused = GTK_TOGGLE_BUTTON(pause)->active;
 #ifdef DIAGNOSTICS
@@ -573,11 +572,17 @@ static gint settings_handler(GtkObject *object, gpointer action)
 		   minefield.cols != GTK_ADJUSTMENT(cols)->value) {
 			minefield.rows = GTK_ADJUSTMENT(rows)->value;
 			minefield.cols = GTK_ADJUSTMENT(cols)->value;
-			minefield_set_board_size(gameboard, minefield.rows, minefield.cols);
 		}
 		minefield.mines = GTK_ADJUSTMENT(mines)->value;
-		g_object_set(G_OBJECT(gameboard), "cell-size", (gint) GTK_ADJUSTMENT(cell_size)->value, NULL);
 		minefield.number = atoi(gtk_entry_get_text(GTK_ENTRY(number)));
+		g_object_set(
+			G_OBJECT(gameboard),
+			"cell-size", (gint) GTK_ADJUSTMENT(cell_size)->value,
+			"rows", (gint) minefield.rows,
+			"columns", (gint) minefield.cols,
+			"probabilities-visible", (gboolean) settings.analysis && settings.show_probability,
+			NULL
+		);
 		local_pre_game(NULL, &minefield.number);
 
 	case settings_act_cancel:
