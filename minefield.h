@@ -33,9 +33,10 @@
 #include <gtk/gtktooltips.h>
 
 
-#define MINEFIELD(obj)		GTK_CHECK_CAST(obj, minefield_get_type(), MineField)
-#define MINEFIELD_CLASS(klass)	GTK_CHECK_CLASS_CAST(klass, minefield_get_type(), MineFieldClass)
-#define IS_MINEFIELD(obj)	GTK_CHECK_TYPE(obj, minefield_get_type())
+#define MINEFIELD_TYPE          (minefield_get_type())
+#define MINEFIELD(obj)		GTK_CHECK_CAST(obj, MINEFIELD_TYPE, MineField)
+#define MINEFIELD_CLASS(klass)	GTK_CHECK_CLASS_CAST(klass, MINEFIELD_TYPE, MineFieldClass)
+#define IS_MINEFIELD(obj)	GTK_CHECK_TYPE(obj, MINEFIELD_TYPE)
 
 
 typedef struct {
@@ -70,10 +71,6 @@ typedef struct {
 	gint  rows;
 	gint  columns;
 
-	gint  tip_row;
-	gint  tip_column;
-	GtkTooltips  *cell_tips;
-
 	PangoLayout  *numeral[8];
 
 	MineFieldState *cell;
@@ -82,7 +79,6 @@ typedef struct {
 
 
 guint minefield_get_type(void);
-MineField *minefield_new(gint, gint);
 void minefield_reset(MineField *);
 void minefield_set_state(MineField *, gint, gint, MineFieldState);
 MineFieldState minefield_get_state(MineField *, gint, gint);

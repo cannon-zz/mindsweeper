@@ -580,7 +580,7 @@ static gint settings_handler(GtkObject *object, gpointer action)
 			"cell-size", (gint) GTK_ADJUSTMENT(cell_size)->value,
 			"rows", (gint) minefield.rows,
 			"columns", (gint) minefield.cols,
-			"probabilities-visible", (gboolean) settings.analysis && settings.show_probability,
+			"has-tooltip", (gboolean) settings.analysis && settings.show_probability,
 			NULL
 		);
 		local_pre_game(NULL, &minefield.number);
@@ -796,7 +796,12 @@ void ui_init(void)
 	gtk_container_set_border_width(GTK_CONTAINER(widget), SPACING);
 	gtk_box_pack_start(GTK_BOX(hbox1), widget, TRUE, FALSE, 0);
 
-	gameboard = minefield_new(minefield.rows, minefield.cols);
+	gameboard = g_object_new(
+		MINEFIELD_TYPE,
+		"rows", (gint) minefield.rows,
+		"columns", (gint) minefield.cols,
+		NULL
+	);
 	gtk_container_add(GTK_CONTAINER(widget), GTK_WIDGET(gameboard));
 	g_signal_connect(GTK_OBJECT(gameboard), "action", G_CALLBACK(board_handler), &minefield);
 
