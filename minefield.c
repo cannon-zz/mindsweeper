@@ -69,13 +69,14 @@
 #include "mf_mined.xpm"
 #include "mf_wrong.xpm"
 
-#define XDEMINEUR_COLOURS_RED   {       0,       0,      0, 0xffff, 0x3535, 0xcccc,      0, 0x9191, 0xc4c4};
-#define XDEMINEUR_COLOURS_GREEN {       0,       0, 0xffff,      0,      0,      0, 0x9999,      0, 0xc4c4};
-#define XDEMINEUR_COLOURS_BLUE  {       0,  0xffff,      0,      0, 0x9191, 0xcccc,      0,      0, 0xc4c4};
+/* 1, 2, 3, 4, 5, 6, 7, 8 */
+#define XDEMINEUR_COLOURS_RED   {      0,      0, 0xffff, 0x3535, 0xcccc,      0, 0x9191, 0xc4c4};
+#define XDEMINEUR_COLOURS_GREEN {      0, 0xffff,      0,      0,      0, 0x9999,      0, 0xc4c4};
+#define XDEMINEUR_COLOURS_BLUE  { 0xffff,      0,      0, 0x9191, 0xcccc,      0,      0, 0xc4c4};
 
-#define GNOMINES_COLOURS_RED    { 0x0000, 0x0000, 0x0000, 0xffff, 0x0000, 0xa0a0, 0x0000, 0xa0a0, 0x0000 }
-#define GNOMINES_COLOURS_GREEN  { 0x0000, 0x0000, 0xa0a0, 0x0000, 0x0000, 0x0000, 0xffff, 0x0000, 0x0000 }
-#define GNOMINES_COLOURS_BLUE   { 0x0000, 0xffff, 0x0000, 0x0000, 0x7fff, 0x0000, 0xffff, 0xa0a0, 0x0000 }
+#define GNOMINES_COLOURS_RED    { 0x0000, 0x0000, 0xffff, 0x0000, 0xa0a0, 0x0000, 0xa0a0, 0x0000 }
+#define GNOMINES_COLOURS_GREEN  { 0x0000, 0xa0a0, 0x0000, 0x0000, 0x0000, 0xffff, 0x0000, 0x0000 }
+#define GNOMINES_COLOURS_BLUE   { 0xffff, 0x0000, 0x0000, 0x7fff, 0x0000, 0xffff, 0xa0a0, 0x0000 }
 
 #define COLOURS_RED	XDEMINEUR_COLOURS_RED
 #define COLOURS_GREEN	XDEMINEUR_COLOURS_GREEN
@@ -245,15 +246,15 @@ static void construct_numerals(MineField *minefield)
 	gint  red[]   = COLOURS_RED;
 	gint  green[] = COLOURS_GREEN;
 	gint  blue[]  = COLOURS_BLUE;
-	gchar  *string[] = { "0", "1", "2", "3", "4", "5", "6", "7", "8" };
+	gchar  *string[] = { "1", "2", "3", "4", "5", "6", "7", "8", NULL };
 	gint  i;
 
-	for(i = 1; i < 9; i++) {
+	for(i = 0; string[i]; i++) {
 		attrlist = pango_attr_list_new();
 		attr_list_insert(attrlist, pango_attr_size_new(minefield->cell_size * PANGO_SCALE * 0.75));
 		attr_list_insert(attrlist, pango_attr_weight_new(PANGO_WEIGHT_BOLD));
 		attr_list_insert(attrlist, pango_attr_foreground_new(red[i], green[i], blue[i]));
-		*minefield_numeral(minefield, i) = layout = gtk_widget_create_pango_layout(GTK_WIDGET(minefield), string[i]);
+		*minefield_numeral(minefield, i + 1) = layout = gtk_widget_create_pango_layout(GTK_WIDGET(minefield), string[i]);
 		pango_layout_set_attributes(layout, attrlist);
 		pango_attr_list_unref(attrlist);
 	}
