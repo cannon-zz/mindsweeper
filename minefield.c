@@ -310,7 +310,7 @@ static void set_board_size(MineField *minefield, gint rows, gint columns)
 		minefield->columns = 0;
 		free_cells(minefield);
 		free_probabilities(minefield);
-		minefield->cell = calloc(rows * columns, sizeof(*minefield->cell));
+		minefield->cell = malloc(rows * columns * sizeof(*minefield->cell));
 		minefield->probability = malloc(rows * columns * sizeof(*minefield->probability));
 		minefield->rows = rows;
 		minefield->columns = columns;
