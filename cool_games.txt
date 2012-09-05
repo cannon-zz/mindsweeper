@@ -1,0 +1,24 @@
+--- BEGIN LOG ---
+kcannon% mindsweeper -a -o -g 1000000 -l
+
+Percent of test complete:
+   10   20   30   40   50   60   70   80   90  100
+....|....|....|....|....|....|....|....|....|....|
+Too many arrangements:  1526257542
+Too many arrangements:  1526257542
+Too many arrangements:  1526257542
+Too many arrangements:  1526257542
+Too many arrangements:  1526257542
+Too many arrangements:  1526257542
+Too many arrangements:  1526257542
+Too many arrangements:  1526257542
+Too many arrangements:  1526257542    *
+Too many arrangements:  1526257542         *
+Too many arrangements:  1526257542             *
+                                                 *
+Games Played: 1000000
+Won: 128774 (12.877400%)
+Lost: 0 (0.000000%)
+Requiring Guess: 871215 (87.121500%)
+Unfinished: 11
+--- END LOG ---
