@@ -1,6 +1,6 @@
 SUBDIRS = desktop pixmaps
 
-INCLUDES = -I$(top_srcdir)/pixmaps -I$(top_srcdir)/pixmaps/counters/$(COUNTER)
+AM_CPPFLAGS = -I$(top_srcdir)/pixmaps -I$(top_srcdir)/pixmaps/counters/$(COUNTER)
 
 bin_PROGRAMS = mindsweeper
 

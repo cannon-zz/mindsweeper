@@ -16,6 +16,8 @@ AC_PROG_INSTALL
 AC_SUBST([GTK_VERSION],[no])
 AM_PATH_GTK_2_0([2.12.0],[GTK_VERSION=yes],,[gthread])
 
+AC_SUBST([AM_CFLAGS], [-Wall])
+
 AC_SUBST([DIAGFLAGS],[])
 AC_ARG_ENABLE([diagnostics],AC_HELP_STRING([--enable-diagnostics],[Include statistics-gathering code]),[DIAGFLAGS=-DDIAGNOSTICS])
 

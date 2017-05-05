@@ -74,7 +74,6 @@ int main(int argc, char *argv[])
 	 * Initialize.
 	 */
 
-	g_thread_init(NULL);
 	gdk_threads_init();
 	gtk_init(&argc, &argv);
 	mindsweeper_init(&minefield);
