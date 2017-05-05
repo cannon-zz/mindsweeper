@@ -78,7 +78,7 @@ typedef struct {
 } MineField;
 
 
-guint minefield_get_type(void);
+GType minefield_get_type(void);
 void minefield_reset(MineField *);
 void minefield_set_state(MineField *, gint, gint, MineFieldState);
 MineFieldState minefield_get_state(MineField *, gint, gint);

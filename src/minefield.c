@@ -95,7 +95,13 @@ enum minefield_signals_t {
 static guint minefield_signal[1] = { 0 } ;      /* signal array */
 static GdkPixmap *pixmap[4];                    /* pixmaps for playing field */
 static GdkBitmap *mask[4];                      /* clip masks for pictures */
-static GtkFixedClass *parent_class = NULL;	/* parent class */
+
+
+G_DEFINE_TYPE(
+	MineField,
+	minefield,
+	GTK_TYPE_WIDGET
+);
 
 
 /*
@@ -391,7 +397,7 @@ static gboolean destroy_event(GtkWidget *widget, GdkEventAny *event)
 	free_numerals(minefield);
 
 	/* FIXME: need to chain? */
-	return GTK_WIDGET_CLASS(parent_class)->destroy_event(widget, event);
+	return GTK_WIDGET_CLASS(minefield_parent_class)->destroy_event(widget, event);
 }
 
 
@@ -508,7 +514,7 @@ static void get_property(GObject *object, enum property id, GValue *value, GPara
  */
 
 
-static void class_init(MineFieldClass *klass)
+static void minefield_class_init(MineFieldClass *klass)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS(klass);
 	GtkWidgetClass *widget_class = GTK_WIDGET_CLASS(klass);
@@ -551,8 +557,6 @@ static void class_init(MineFieldClass *klass)
 	/*
 	 * Object methods
 	 */
-
-	parent_class = g_type_class_peek_parent(klass);
 
 	object_class->set_property = set_property;
 	object_class->get_property = get_property;
@@ -606,7 +610,7 @@ static void class_init(MineFieldClass *klass)
 }
 
 
-static void object_init(MineField *minefield)
+static void minefield_init(MineField *minefield)
 {
 	GTK_WIDGET_UNSET_FLAGS(minefield, GTK_NO_WINDOW);
 
@@ -616,34 +620,6 @@ static void object_init(MineField *minefield)
 	g_signal_connect(GTK_OBJECT(minefield), "query-tooltip", G_CALLBACK(tooltip_handler), NULL);
 
 	construct_numerals(minefield);
-}
-
-
-/*
- * ============================================================================
- *
- *                                Entry Point
- *
- * ============================================================================
- */
-
-
-guint minefield_get_type(void)
-{
-	static guint minefield_type = 0;
-
-	if(!minefield_type) {
-		GtkTypeInfo minefield_info = (GtkTypeInfo) {
-			.type_name = "MineField",
-			.object_size = sizeof(MineField),
-			.class_size = sizeof(MineFieldClass),
-			.class_init_func = (GtkClassInitFunc) class_init,
-			.object_init_func = (GtkObjectInitFunc) object_init
-		};
-		minefield_type = gtk_type_unique(GTK_TYPE_WIDGET, &minefield_info);
-	}
-
-	return minefield_type;
 }
 
 
