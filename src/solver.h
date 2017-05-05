@@ -21,45 +21,21 @@
 #ifndef _SOLVER_H
 #define _SOLVER_H
 
-#include <pthread.h>
-
 /*
  * Search status
  */
 
+
 enum  status_t  { stopped, searching, guess, noguess, gameover };
-
-
-/*
- * start_search()
- *
- * Signals the need to start a new search.
- */
-
-extern pthread_mutex_t  solver_start_mutex;
-extern pthread_cond_t   solver_start_cond;
-extern int  solver_start_requested;
-
-static void start_search(void)
-{
-	pthread_mutex_lock(&solver_start_mutex);
-	pthread_cond_signal(&solver_start_cond);
-	solver_start_requested = 1;
-	pthread_mutex_unlock(&solver_start_mutex);
-}
 
 
 /*
  * Function prototypes
  */
 
-void *autoplay(void *);
 
-static void solver_init(void)
-{
-	solver_start_requested = 0;
-	pthread_mutex_init(&solver_start_mutex, NULL);
-	pthread_cond_init(&solver_start_cond, NULL);
-}
+void solver_init(void);
+void start_search(void);
+void *autoplay(void *);
 
 #endif /* _SOLVER_H */

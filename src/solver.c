@@ -101,6 +101,28 @@ pthread_mutex_t  solver_start_mutex;
 pthread_cond_t   solver_start_cond;
 int  solver_start_requested;
 
+void solver_init(void)
+{
+	solver_start_requested = 0;
+	pthread_mutex_init(&solver_start_mutex, NULL);
+	pthread_cond_init(&solver_start_cond, NULL);
+}
+
+
+/*
+ * start_search()
+ *
+ * Signals the need to start a new search.
+ */
+
+void start_search(void)
+{
+	pthread_mutex_lock(&solver_start_mutex);
+	pthread_cond_signal(&solver_start_cond);
+	solver_start_requested = 1;
+	pthread_mutex_unlock(&solver_start_mutex);
+}
+
 
 /*
  * update_probability()
