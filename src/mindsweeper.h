@@ -259,13 +259,6 @@ static int FLAGSAROUND(struct minefield_t *mf, int i, int j)
 
 void	pre_game(struct minefield_t *, unsigned int);
 int	make_move(struct minefield_t *, int, int, int, enum action_t);
-
-static void mindsweeper_init(struct minefield_t *mf)
-{
-	state = STATE_INITIALIZER;
-	*mf = MINEFIELD_INITIALIZER;
-	settings = SETTINGS_INITIALIZER;
-	stats = STATS_INITIALIZER;
-}
+void	mindsweeper_init(struct minefield_t *);
 
 #endif /* _MINDSWEEPER_H */

@@ -32,6 +32,19 @@ struct stats  stats;
 
 
 /*
+ * mindsweeper_init()
+ */
+
+void mindsweeper_init(struct minefield_t *mf)
+{
+	state = STATE_INITIALIZER;
+	*mf = MINEFIELD_INITIALIZER;
+	settings = SETTINGS_INITIALIZER;
+	stats = STATS_INITIALIZER;
+}
+
+
+/*
  * update_square()
  *
  * tells the UI to set the graphic for the (row,col)th square.
