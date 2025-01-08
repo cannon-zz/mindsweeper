@@ -1,7 +1,5 @@
 # MindSweeper
 
-Last update 2003/04/25
-
 Welcome to the home page for MindSweeper, yet another incarnation of
 minesweeper --- everybody's favourite waste of CPU cycles!  My
 implementation's claim to fame is that it includes a game solver so that
@@ -23,15 +21,15 @@ Current features:
   made without guessing.
 - Option to display the probability of finding a mine in each cell based
   on the information available.
-- Option to "autoplay" the game:  to automatically make any moves that
+- Option to autoplay the game:  to automatically make any moves that
   can be made without guessing.
 - Option to autoplay a specified number of games and record the
   percentage that could be completed without guessing, thereby measuring
-  the "playability" of a given board size and mine density.
+  the playability of a given board size and mine density.
 
 A recent copy of the TODO list:
 
-- Improve the search status graphics and "odometer" numerals.
+- Improve the search status graphics and odometer numerals.
 - Split the solver into a front-end and back-end so the algorithm can be
   more easily re-used.
 - Option to filter games on solvability.
@@ -51,11 +49,11 @@ A difficult board to analyze, showing the result for one cell.
 
 ## Solving Minesweeper
 
-The solver in this game uses a "brute force" approach.  It begins by
+The solver in this game uses a brute force approach.  It begins by
 identifying all of the unmarked cells for which information is available
 and then systematically tests each possible arrangement of flags in
 those cells searching for flag arrangements that are consistent with all
-available information.  As the search procedes, for each cell a count is
+available information.  As the search proceeds, for each cell a count is
 kept of the number of valid arrangements in which it was flagged.  When
 the search terminates, the ratio of this number to the total number of
 valid arrangements gives the probability of finding a mine in that
@@ -72,19 +70,19 @@ example a corner square with a 1 diagonally adjacent to it.
 A special algorithm is included in the solver for handling these cases
 and it is only when this algorithm fails to identify a move that the
 full brute-force search is begun.  Another trick that is used is the
-separation of the border cells into independant groups:  groups of cells
+separation of the border cells into independent groups:  groups of cells
 whose flag placements do not influence each other.  A full solution to
-the problem of identifying logically independant cell groups is as
+the problem of identifying logically independent cell groups is as
 complex as actually solving the game.  The test that is used here is
 simply to check if two cells share the same information and if they
-don't then they are said to be independant.  In this sense, it is more
-accurate to say the cells are divided into "geographically distinct"
+don't then they are said to be independent.  In this sense, it is more
+accurate to say the cells are divided into geographically distinct
 sets.  This separation greatly reduces the number of flag permutations
 that need to be searched.
 
 The final trick that is used, although it is not much of trick, is to
 search the permutations for valid flag arrangements using an in-order
-tree traversal algorithm.  This allows entire brances of the tree to be
+tree traversal algorithm.  This allows entire branches of the tree to be
 ruled out early on without having to actually test each possible
 permutation one-by-one.  Consider, for example, that the border region
 in the screenshot above contains 78 unmarked cells.  Given that there
@@ -99,7 +97,7 @@ illustrates the efficiency with which permutations are analyzed.
 
 At the same time, the solver also takes into account the fact that it is
 playing on a finite field with a known total number of mines.  This
-information is used to rule out flag permutations that would excede the
+information is used to rule out flag permutations that would exceed the
 number of mines and this additional restriction sometimes allows boards
 to be played to completion that could not be completed otherwise.  The
 limit on the number of mines can also sometimes allow cells outside of
@@ -110,7 +108,7 @@ than some number of flags it may be necessary to flag all other cells.
 
 Overall, on modern personal computers the solver is capable of playing
 the game much faster than a human which allows it to play along with the
-user in real time.  In practice, "Advanced" level boards rarely take
+user in real time.  In practice, Advanced level boards rarely take
 more than 2 seconds to play to completion on the system described above
 and are most often completed with 0 still showing on the clock.
 
